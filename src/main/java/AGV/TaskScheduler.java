@@ -31,4 +31,8 @@ public class TaskScheduler {
     private Forklifter getAvailableForklifter(Task task) { //TODO get nearest available Forklifter for given task
         return null;
     }
+
+    private boolean isSchedulable(Task task) {
+        return false;
+    }
 }
