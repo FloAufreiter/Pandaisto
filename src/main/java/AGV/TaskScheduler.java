@@ -1,5 +1,7 @@
 package AGV;
 
+import shared.Commodity;
+import shared.Location;
 import shared.Task;
 
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ public class TaskScheduler {
         }
     }
 
-    public void scheduleTask(Task task) {
+    private void scheduleTask(Task task) {
 
     }
 
@@ -36,7 +38,7 @@ public class TaskScheduler {
         return false;
     }
 
-    public boolean createTask() {
+    public boolean createTask(Location location1, Location location2, Commodity cmdty) {
         return false;
     }
 }

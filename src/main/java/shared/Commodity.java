@@ -1,6 +1,9 @@
 package shared;
 
 public class Commodity {
+    int id;
+    ItemType type;
+
     public class Size {
         private int length;
         private int width;
