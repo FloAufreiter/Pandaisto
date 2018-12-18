@@ -35,4 +35,8 @@ public class TaskScheduler {
     private boolean isSchedulable(Task task) {
         return false;
     }
+
+    public boolean createTask() {
+        return false;
+    }
 }
