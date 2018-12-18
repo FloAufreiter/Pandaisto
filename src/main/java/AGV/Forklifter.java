@@ -1,9 +1,6 @@
 package AGV;
 
 import shared.Location;
-import shared.Task;
-
-import java.util.ArrayList;
 
 class Forklifter implements Runnable {
 
@@ -21,6 +18,10 @@ class Forklifter implements Runnable {
     private final int maximumCarriageWidth = 3;
 
     private Location currentLocation;
+
+    public void setCurrentRoute(Route currentRoute) {
+        this.currentRoute = currentRoute;
+    }
 
     private Route currentRoute;
 
@@ -41,21 +42,37 @@ class Forklifter implements Runnable {
     }
 
     void execute() {
+        for(Location l: currentRoute.getRouteActions().keySet()) {
+            driveToLocation(l);
+            switch (currentRoute.getRouteActions().get(l)) {
+                case LOAD: load();
+                case UNLOAD: unload();
+            }
+        }
     }
+
 
     private void driveToLocation(Location location) {
         //TODO compute und wait drive-time
     }
 
-    private void setForkHeight() {
+    private void setForkHeight(int height) {
 
     }
 
     private void load() {
-
+        try {
+            Thread.sleep(60000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void unload() {
-
+        try {
+            Thread.sleep(40000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
