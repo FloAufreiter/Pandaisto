@@ -9,41 +9,34 @@ import java.util.concurrent.BlockingQueue;
 
 public class TaskScheduler implements Runnable {
 
-    public void stopAgv() {
+    public void stopScheduler() {
         STOP_AGV = true;
+        System.out.println(tasks.isEmpty());
     }
 
-    public void startAGV() {
-        STOP_AGV = false;
-        run();
-    }
+    private boolean STOP_AGV = false;
 
-    private static boolean STOP_AGV = false;
+    private ArrayList<Forklift> forklifts = new ArrayList<>();
 
-    private static final TaskScheduler instance = new TaskScheduler();
+    private BlockingQueue<Task> tasks = new ArrayBlockingQueue<>(100);
 
-
-    private static final ArrayList<Forklift> FORKLIFTS = new ArrayList<>();
-
-    private static BlockingQueue<Task> TASKS = new ArrayBlockingQueue<>(100);
-
-    private TaskScheduler() {
+    TaskScheduler() {
         initForklifts();
-        instance.run();
     }
 
-    private static void initForklifts() {
+    private void initForklifts() {
         for (int i = 0; i < 10; i++) {
-            FORKLIFTS.add(new Forklift());
+            System.out.println(forklifts);
+            forklifts.add(new Forklift());
         }
     }
 
-    private static void scheduleTasksToForklift() {
+    private void scheduleTasksToForklift() {
         List<Forklift> freeLifters = getAvailableForklifts();
-        while (!TASKS.isEmpty() && !freeLifters.isEmpty()) {
+        while (!tasks.isEmpty() && !freeLifters.isEmpty()) {
             try {
                 double min_cost = Double.MAX_VALUE;
-                Task t = TASKS.take();
+                Task t = tasks.take();
                 Forklift nearest_free = null;
                 for (Forklift f : freeLifters) {
                     Double d = Area.getMinimalCostFrom(f.getCurrentLocation(), t.getLocationA());
@@ -68,9 +61,9 @@ public class TaskScheduler implements Runnable {
         }
     }
 
-    private static List<Forklift> getAvailableForklifts() {
+    private List<Forklift> getAvailableForklifts() {
         List<Forklift> freeLifters = new ArrayList<>();
-        for (Forklift f : FORKLIFTS) {
+        for (Forklift f : forklifts) {
             if (f.getStatus() == Forklift.Status.available) {
                 freeLifters.add(f);
             }
@@ -78,13 +71,13 @@ public class TaskScheduler implements Runnable {
         return freeLifters;
     }
 
-    public static synchronized boolean createTask(Location location1, Location location2, Commodity commodity) {
-        if (TASKS.size() == 100) {
+    public synchronized boolean createTask(Location location1, Location location2, Commodity commodity) {
+        if (tasks.size() == 100) {
             return false;
         } else {
             Task t = new Task(location1, location2, commodity);
             try {
-                TASKS.add(t);
+                tasks.add(t);
                 return true;
             } catch (IllegalStateException e) {
                 return false;
@@ -94,8 +87,8 @@ public class TaskScheduler implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
-            if (!TASKS.isEmpty()) {
+        while (!STOP_AGV || !tasks.isEmpty()) {
+            if (!tasks.isEmpty()) {
                 scheduleTasksToForklift();
             }
         }

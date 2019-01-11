@@ -4,6 +4,10 @@ import shared.Commodity;
 
 class Forklift implements Runnable {
 
+    static int IDS;
+
+    private int id = IDS++;
+
     private static int FORKHEIGHT_1 = 1;
 
     private static int FORKHEIGHT_2 = 2;
@@ -11,14 +15,6 @@ class Forklift implements Runnable {
     private Status status = Status.available;
 
     private static final int maximumCarriageWeight = 1000;
-
-    public static int getMaximumCarriageWeight() {
-        return maximumCarriageWeight;
-    }
-
-    public int getCurrentCarriageWeight() {
-        return currentCarriageWeight;
-    }
 
     private int currentCarriageWeight = 0;
 
@@ -30,7 +26,7 @@ class Forklift implements Runnable {
         return currentLocation;
     }
 
-    private Location currentLocation;
+    private Location currentLocation = Area.getRandomLocation();
 
     private Route loadingRoute = new Route();
     private Route unloadingRoute = new Route();
@@ -47,7 +43,7 @@ class Forklift implements Runnable {
 
 
     void execute() {
-        run();
+        new Thread(this, String.valueOf(id)).run();
     }
 
     @Override
@@ -61,6 +57,7 @@ class Forklift implements Runnable {
         while (!route.getStops().isEmpty()) {
             Location nearest = getNextNearestLocation(route);
             driveToLocation(nearest);
+            System.out.println(nearest);
             Task t = route.getStops().get(nearest);
             switch (t.getCurrentState()) {
                 case unprocessed:
@@ -70,25 +67,26 @@ class Forklift implements Runnable {
                 case loaded:
                     unloadCommodity(route.getStops().get(nearest).getCmdty());
                     t.switchState();
+                    System.out.println("done " + t.getId());
                     break;
                 case finished:
                     return;
             }
+            route.getStops().remove(nearest);
             currentLocation = nearest;
         }
     }
 
-    private Location getNextNearestLocation(Route unloadingRoute) {
+    private Location getNextNearestLocation(Route route) {
         Location nearest = null;
         double min_cost = Double.MAX_VALUE;
-        for (Location l : unloadingRoute.getStops().keySet()) {
+        for (Location l : route.getStops().keySet()) {
             Double d = Area.getMinimalCostFrom(this.getCurrentLocation(), l);
             if (d < min_cost) {
                 min_cost = d;
                 nearest = l;
             }
         }
-        unloadingRoute.getStops().remove(nearest);
         return nearest;
     }
 
@@ -124,8 +122,8 @@ class Forklift implements Runnable {
                     setForkHeight(FORKHEIGHT_2);
                     break;
             }
-            Thread.sleep(60000);
-        } catch (InterruptedException e) {
+            Thread.sleep(6000);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -133,7 +131,7 @@ class Forklift implements Runnable {
     private void unloadCommodity(Commodity c) {
         //TODO trigger functions of other subsystems
         try {
-            Thread.sleep(40000);
+            Thread.sleep(4000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

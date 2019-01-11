@@ -4,6 +4,30 @@ import shared.Commodity;
 
 class Task {
 
+    static int ids = 0;
+
+    private int id;
+    private Location locationA;
+    private Location locationB;
+    private Commodity cmdty;
+    private State currentState = State.unprocessed;
+    //long deadline;
+
+
+    Task(Location locationA, Location locationB, Commodity cmdty) {
+        this.id = ids;
+        ids++;
+        this.locationA = locationA;
+        this.locationB = locationB;
+        this.cmdty = cmdty;
+    }
+
+    enum State {
+        unprocessed,
+        loaded,
+        finished
+    }
+
     Location getLocationA() {
         return locationA;
     }
@@ -16,29 +40,13 @@ class Task {
         return cmdty;
     }
 
-    private Location locationA;
-    private Location locationB;
-    private Commodity cmdty;
-
-    Task(Location locationA, Location locationB, Commodity cmdty) {
-        this.locationA = locationA;
-        this.locationB = locationB;
-        this.cmdty = cmdty;
-    }
-
-    enum State {
-        unprocessed,
-        loaded,
-        finished
+    public int getId() {
+        return id;
     }
 
     State getCurrentState() {
         return currentState;
     }
-
-    private State currentState = State.unprocessed;
-
-    long deadline;
 
     State switchState() {
         switch (currentState) {
