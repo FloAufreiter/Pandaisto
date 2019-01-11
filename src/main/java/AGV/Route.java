@@ -1,18 +1,16 @@
 package AGV;
 
-import shared.Location;
 import java.util.HashMap;
 
-//Used to accumulate Tasks and define Routes for Forklifters
-public class Route {
+class Route {
 
-    private HashMap<Location, Forklifter.Action> routeActions;
+    private HashMap<Location, Task> stops = new HashMap<>();
 
-    void addLocationAndAction(Location location, Forklifter.Action action) {
-        routeActions.put(location, action);
+    void addLocation(Location location, Task task) {
+        stops.put(location, task);
     }
 
-    public HashMap<Location, Forklifter.Action> getRouteActions() {
-        return routeActions;
+    HashMap<Location, Task> getStops() {
+        return stops;
     }
 }
