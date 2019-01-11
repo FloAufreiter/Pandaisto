@@ -6,13 +6,17 @@ class Forklift implements Runnable {
 
     static int IDS;
 
+    public int getId() {
+        return id;
+    }
+
     private int id = IDS++;
 
     private static int FORKHEIGHT_1 = 1;
 
     private static int FORKHEIGHT_2 = 2;
 
-    private Status status = Status.available;
+    private Status status = Status.AVAILABLE;
 
     private static final int maximumCarriageWeight = 1000;
 
@@ -36,28 +40,33 @@ class Forklift implements Runnable {
     }
 
     enum Status {
-        available,
-        outOfOrder,
-        inUse
+        AVAILABLE,
+        OUT_OF_ORDER,
+        IN_USE
     }
 
 
     void execute() {
+        if(loadingRoute.getStops().isEmpty()) {
+            return;
+        }
         new Thread(this, String.valueOf(id)).run();
     }
 
     @Override
     public void run() {
-        status = Status.inUse;
+        status = Status.IN_USE;
+        AGV.updateGui(this);
         executeRoute(loadingRoute);
         executeRoute(unloadingRoute);
+        status = Status.AVAILABLE;
+        AGV.updateGui(this);
     }
 
     private void executeRoute(Route route) {
         while (!route.getStops().isEmpty()) {
             Location nearest = getNextNearestLocation(route);
             driveToLocation(nearest);
-            System.out.println(nearest);
             Task t = route.getStops().get(nearest);
             switch (t.getCurrentState()) {
                 case unprocessed:
@@ -74,6 +83,7 @@ class Forklift implements Runnable {
             }
             route.getStops().remove(nearest);
             currentLocation = nearest;
+            AGV.updateGui(this);
         }
     }
 
@@ -143,7 +153,7 @@ class Forklift implements Runnable {
     }
 
     private void maintain(long duration) {
-        status = Status.outOfOrder;
+        status = Status.OUT_OF_ORDER;
         try {
             Thread.sleep(duration);
         } catch (InterruptedException e) {

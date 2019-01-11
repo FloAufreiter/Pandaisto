@@ -1,7 +1,6 @@
 package AGV;
 
 import shared.Commodity;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -16,6 +15,10 @@ public class TaskScheduler implements Runnable {
 
     private boolean STOP_AGV = false;
 
+    ArrayList<Forklift> getForklifts() {
+        return forklifts;
+    }
+
     private ArrayList<Forklift> forklifts = new ArrayList<>();
 
     private BlockingQueue<Task> tasks = new ArrayBlockingQueue<>(100);
@@ -26,7 +29,6 @@ public class TaskScheduler implements Runnable {
 
     private void initForklifts() {
         for (int i = 0; i < 10; i++) {
-            System.out.println(forklifts);
             forklifts.add(new Forklift());
         }
     }
@@ -64,7 +66,7 @@ public class TaskScheduler implements Runnable {
     private List<Forklift> getAvailableForklifts() {
         List<Forklift> freeLifters = new ArrayList<>();
         for (Forklift f : forklifts) {
-            if (f.getStatus() == Forklift.Status.available) {
+            if (f.getStatus() == Forklift.Status.AVAILABLE) {
                 freeLifters.add(f);
             }
         }
@@ -84,6 +86,7 @@ public class TaskScheduler implements Runnable {
             }
         }
     }
+
 
     @Override
     public void run() {

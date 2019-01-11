@@ -101,7 +101,6 @@ public class Area {
     }
 
     static Double getMinimalCostFrom(Location start, Location dest) {
-        long millis = System.currentTimeMillis();
         SearchProblem p = GraphSearchProblem
                 .startingFrom(start)
                 .goalAt(dest)
@@ -110,7 +109,6 @@ public class Area {
                 .build();
         Hipster.createDijkstra(p);
         WeightedNode node = (WeightedNode) Hipster.createDijkstra(p).search(dest).getGoalNode();
-        System.out.println(System.currentTimeMillis() - millis);
         return (Double) node.getCost();
     }
 }

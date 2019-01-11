@@ -29,6 +29,6 @@ public class Location {
 
     @Override
     public String toString() {
-        return "id " + id + " type: " + type;
+        return type + " at id: " + id;
     }
 }
