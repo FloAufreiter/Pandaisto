@@ -1,4 +1,6 @@
 package shared;
 
-public class ItemType {
+public enum ItemType {
+	
+	BLUE_CAR, RED_CAR
 }

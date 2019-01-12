@@ -1,7 +1,22 @@
 package Monitoring;
 
-public class ComponentOrder {
+import shared.ItemType;
+
+public class ComponentOrder extends Order{
 	
-	// Test
+	int amount;
+	ItemType itemType;
+	
+	
+	
+	
+	
+	public ComponentOrder(int amount, ItemType itemType) {
+		
+		this.amount = amount;
+		this.itemType = itemType;
+	}
+	
+
 
 }
