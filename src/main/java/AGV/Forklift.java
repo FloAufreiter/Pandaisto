@@ -1,6 +1,8 @@
 package AGV;
 
-import shared.Commodity;
+import shared.ItemContainer;
+import shared.ItemType;
+import warehouse.AGVInterface;
 
 class Forklift implements Runnable {
 
@@ -23,7 +25,8 @@ class Forklift implements Runnable {
     private int currentCarriageWeight = 0;
 
     boolean canAcceptTask(Task t) {
-        return currentCarriageWeight + t.getCmdty().getWeight() <= maximumCarriageWeight;
+        int weight_of_task = t.getItemType().getweight();
+        return currentCarriageWeight + weight_of_task <= maximumCarriageWeight;
     }
 
     Location getCurrentLocation() {
@@ -70,11 +73,11 @@ class Forklift implements Runnable {
             Task t = route.getStops().get(nearest);
             switch (t.getCurrentState()) {
                 case unprocessed:
-                    loadCommodity(route.getStops().get(nearest).getCmdty(), nearest.getType());
+                    loadCommodity(route.getStops().get(nearest).getItemType(), nearest);
                     t.switchState();
                     break;
                 case loaded:
-                    unloadCommodity(route.getStops().get(nearest).getCmdty());
+                    unloadCommodity(route.getStops().get(nearest).getItemType(), nearest);
                     t.switchState();
                     System.out.println("done " + t.getId());
                     break;
@@ -121,16 +124,22 @@ class Forklift implements Runnable {
         }
     }
 
-    private void loadCommodity(Commodity c, Location.LocationType type) {
+    private void loadCommodity(ItemType it, Location location) {
         //TODO trigger functions of other subsystems
         try {
-            switch (type) {
+            switch (location.getType()) {
+                case FLOORSHELF:
+                    AGVInterface.confirmItemRemoval(location.getId());
+                    break;
                 case TOPSHELF1:
                     setForkHeight(FORKHEIGHT_1);
+                    AGVInterface.confirmItemRemoval(location.getId());
                     break;
                 case TOPSHELF2:
                     setForkHeight(FORKHEIGHT_2);
+                    AGVInterface.confirmItemRemoval(location.getId());
                     break;
+                case PRODUCTION_LINE:
             }
             Thread.sleep(6000);
         } catch (Exception e) {
@@ -138,10 +147,20 @@ class Forklift implements Runnable {
         }
     }
 
-    private void unloadCommodity(Commodity c) {
+    private void unloadCommodity(ItemType it, Location location) {
         //TODO trigger functions of other subsystems
         try {
             Thread.sleep(4000);
+            switch(location.getType()) {
+                case FLOORSHELF:
+                    AGVInterface.confirmItemAdded(location.getId(), it);
+                case TOPSHELF1:
+                    setForkHeight(FORKHEIGHT_1);
+                    AGVInterface.confirmItemAdded(location.getId(), it);
+                case TOPSHELF2:
+                    setForkHeight(FORKHEIGHT_2);
+                    AGVInterface.confirmItemAdded(location.getId(), it);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

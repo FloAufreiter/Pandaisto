@@ -1,6 +1,7 @@
 package AGV;
 
-import shared.Commodity;
+import shared.ItemContainer;
+import shared.ItemType;
 
 class Task {
 
@@ -9,17 +10,17 @@ class Task {
     private int id;
     private Location locationA;
     private Location locationB;
-    private Commodity cmdty;
+    private ItemType itemType;
     private State currentState = State.unprocessed;
     //long deadline;
 
 
-    Task(Location locationA, Location locationB, Commodity cmdty) {
+    Task(Location locationA, Location locationB, ItemType itemType) {
         this.id = ids;
         ids++;
         this.locationA = locationA;
         this.locationB = locationB;
-        this.cmdty = cmdty;
+        this.itemType = itemType;
     }
 
     enum State {
@@ -36,8 +37,8 @@ class Task {
         return locationB;
     }
 
-    Commodity getCmdty() {
-        return cmdty;
+    ItemType getItemType() {
+        return this.itemType;
     }
 
     public int getId() {

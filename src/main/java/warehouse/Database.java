@@ -2,6 +2,8 @@ package warehouse;
 
 import java.sql.*;
 import java.util.ArrayList;
+
+import AGV.Location;
 import shared.ItemType;
 
 /**
@@ -60,6 +62,7 @@ public class Database {
     private final PreparedStatement itemByIDStmt;
     private final PreparedStatement idByItemTypeStmt;
     private final PreparedStatement itemStockStmt;
+    private final PreparedStatement getLevelStmt;
     
     //list of listeners that act on changes to database
     private final ArrayList<DBListener> listeners;
@@ -82,7 +85,7 @@ public class Database {
 		deleteWarehouseStmt = conn.prepareStatement("delete from warehouses where warehouseID=?");
 		numUsedShelvesStmt = conn.prepareStatement("select count(*) as total from shelves where warehouseID=?");
 		numShelvesStmt = conn.prepareStatement("select shelfCapacity from warehouses where warehouseID=?");
-		insertShelfStmt = conn.prepareStatement("insert into shelves values(?,?,?,?)");
+		insertShelfStmt = conn.prepareStatement("insert into shelves values(?,?,?,?,?)");
 		deleteShelfStmt = conn.prepareStatement("delete from shelves where shelfID=?");
     	deleteShelvesStmt = conn.prepareStatement("delete from shelves where warehouseID=?");
     	insertItemStmt = conn.prepareStatement("update shelfspaces set type=? where shelfspaceID=?");
@@ -94,7 +97,8 @@ public class Database {
     	itemByIDStmt = conn.prepareStatement("select type from shelfspaces where shelfID=?");
     	idByItemTypeStmt = conn.prepareStatement("select shelfspaceID from shelfspaces where type=?");
     	itemStockStmt = conn.prepareStatement("Select count(*) as cnt from shelfspaces where type=?");
-    	
+		getLevelStmt = conn.prepareStatement("Select level from shelves where shelfID=?");
+
     	listeners = new ArrayList<>();
     	p = new PathOrganizer();
     	this.addListener(p);
@@ -134,30 +138,20 @@ public class Database {
      * Method for adding shelves to existing warehouse
      * @param shelfID
      * @param warehouseID
-     * @param capacity
-     * @param distance
      * @return
      */
-    public boolean insertShelf(int shelfID, int warehouseID, int capacity, int distance) {
+    public boolean insertShelf(int shelfID, int warehouseID, int level) {
     	synchronized (insertShelfStmt) {
     		try {
 				int freeShelves = numFreeShelves(warehouseID);
 				if(freeShelves <= 0) return false;
 				insertShelfStmt.setInt(1, shelfID);
 				insertShelfStmt.setInt(2, warehouseID);
-				insertShelfStmt.setInt(3, capacity);
-				insertShelfStmt.setInt(4, distance);
+				insertShelfStmt.setInt(3, 1000);
+				insertShelfStmt.setInt(4, 1000);
+				insertShelfStmt.setInt(5, level);
 				insertShelfStmt.executeUpdate();
 
-				synchronized (insertShelfSpaceStmt) {
-		    		for(int i = 0; i < 10; i++) {
-		    			for(int j = 0; j < capacity/10; j++) {
-							insertShelfSpaceStmt.setInt(1, Integer.parseInt(Integer.toString(j)+Integer.toString(shelfID) + Integer.toString(i)));
-							insertShelfSpaceStmt.setInt(2, shelfID);
-							insertShelfSpaceStmt.executeUpdate();
-		    			}
-					}
-				}
     		} catch(SQLException e) {
 				return ! deleteShelf(shelfID);
     		}
@@ -166,6 +160,47 @@ public class Database {
 			return true;
 		}
     }
+
+    public Location.LocationType getLevel(int shelfID) {
+    	synchronized (getLevelStmt) {
+    		try{
+    			getLevelStmt.setInt(1, shelfID);
+
+				ResultSet res = getLevelStmt.executeQuery();
+				int ret = 0;
+				if(res.next()) { //this is going to be optimized later on to return item with least distance
+					ret = res.getInt("level");
+				}
+				return levelToLoc(ret);
+			} catch(SQLException e) {
+    			e.printStackTrace();
+			}
+			return null;
+		}
+	}
+
+	private Location.LocationType levelToLoc(int level) {
+    	switch(level) {
+			case 0: return Location.LocationType.FLOORSHELF;
+			case 1: return Location.LocationType.TOPSHELF1;
+			case 2: return Location.LocationType.TOPSHELF2;
+		}
+		return null;
+	}
+
+    public boolean addShelfSpace(int shelfID, int shelfSpaceID) {
+    	synchronized (insertShelfSpaceStmt) {
+			try {
+				insertShelfSpaceStmt.setInt(1, shelfSpaceID);
+				insertShelfSpaceStmt.setInt(2, shelfID);
+				insertShelfSpaceStmt.executeUpdate();
+				return true;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+	}
     
     /**
      * Method for deleting shelves from warehouse
@@ -192,15 +227,15 @@ public class Database {
      * @param type
      * @return
      */
-    public boolean insertItem(ItemType type) {
+    public boolean insertItem(int shelfSpaceID, ItemType type) {
     	try {
-    		int shelfSpaceID = getFreeShelfSpace();
     		System.out.println("ShelfID:"+shelfSpaceID);
     		if(shelfSpaceID < 0) return false; //TODO: alarm delivery organizer (in general introduce events)
     		insertItemStmt.setString(1, type.toString());
 	    	insertItemStmt.setInt(2, shelfSpaceID);
 	    	insertItemStmt.executeUpdate();
     	} catch(SQLException e) {
+    		e.printStackTrace();
     		return false;
     	}
     	fireEvent(EventType.ItemAdded, type);
@@ -296,9 +331,9 @@ public class Database {
     	String createWarehouseTable = "create table Warehouses (warehouseID integer primary key not Null," + 
     			"shelfCapacity integer)";
     	String createShelfTable ="create table Shelves (shelfID integer primary key not Null," +
-    			"warehouseID integer references warehouses(warehouseID) not Null, itemCapacity integer, distance integer)";
+    			"warehouseID integer references warehouses(warehouseID) not Null, itemCapacity integer, distance integer, level integer)"; //level can be 0 1 or 2
     	String createShelfSpaceTable = "create table shelfSpaces (shelfSpaceID integer primary key not null,"+
-    			"shelfID integer references shelves(shelfID) not null, type varchar(32) default null, weight integer, deliveryID integer references deliveries(deliveryID))";
+    			"shelfID integer references shelves(shelfID) not null, type varchar(32) default null, deliveryID integer references deliveries(deliveryID))";
     	String createDeliveryTable = "create table Deliveries (deliveryID integer primary key not null,"+
     			"loadingDockID integer references loadingdocks(loadingdockid) not null, expectedDeliveryDate Date)";
     	String createLoadingDockTable = "create table LoadingDocks (loadingDockID integer primary key not null)";
@@ -334,7 +369,7 @@ public class Database {
     	for(DBListener l: listeners) l.notifyEvent(e);
     }
     
-    private int getFreeShelfSpace() throws SQLException {
+    int getFreeShelfSpace() throws SQLException {
 		synchronized (freeShelfSpaceStmt) {
 			ResultSet res = freeShelfSpaceStmt.executeQuery();
 			if(res.next()) {

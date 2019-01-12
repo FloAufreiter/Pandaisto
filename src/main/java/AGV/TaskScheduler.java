@@ -1,6 +1,9 @@
 package AGV;
 
 import shared.Commodity;
+import shared.ItemContainer;
+import shared.ItemType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -73,11 +76,12 @@ public class TaskScheduler implements Runnable {
         return freeLifters;
     }
 
-    public synchronized boolean createTask(Location location1, Location location2, Commodity commodity) {
+    public synchronized boolean createTask(Location location1, Location location2, ItemType itemType) {
         if (tasks.size() == 100) {
             return false;
         } else {
-            Task t = new Task(location1, location2, commodity);
+            //TODO change Commodity to ItemContainer
+            Task t = new Task(location1, location2, itemType);
             try {
                 tasks.add(t);
                 return true;

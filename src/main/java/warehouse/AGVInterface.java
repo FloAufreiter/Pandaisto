@@ -1,5 +1,8 @@
 package warehouse;
 
+import shared.ItemContainer;
+import shared.ItemType;
+
 import java.sql.SQLException;
 
 /**
@@ -14,7 +17,7 @@ public class AGVInterface extends MessagingInterface {
 	 * @param shelfPlaceID - the shelfplace where the item is removed
 	 * @return boolean stating if item removal was completed
 	 */
-	public boolean confirmItemRemoval(int shelfPlaceID) {
+	public static boolean confirmItemRemoval(int shelfPlaceID) {
 		try {
 			Database.getInstance().deleteItem(shelfPlaceID);
 			return true;
@@ -22,6 +25,14 @@ public class AGVInterface extends MessagingInterface {
 			// TODO properly handle exception
 			e.printStackTrace();
 			return false;
+		}
+	}
+
+	public static void confirmItemAdded(int shelfPlaceID, ItemType type) {
+		try {
+			Database.getInstance().insertItem(shelfPlaceID, type);
+		} catch(SQLException e) {
+			e.printStackTrace();
 		}
 	}
 }

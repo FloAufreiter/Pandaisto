@@ -1,6 +1,9 @@
 package warehouse;
 
 import java.sql.SQLException;
+
+import AGV.Location;
+import shared.ItemContainer;
 import shared.ItemType;
 
 /**
@@ -12,17 +15,31 @@ public abstract class MessagingInterface {
 
 	/**
 	 * Method for getting item from database
-	 * @param type the type of item to be searched for
 	 * @return int representing item location in warehouse, -1 otherwise
 	 */
-	public int getItemLocation(ItemType type) {
+	public static ShelfType getFreeItemLocation(ItemContainer container) {
 		try {
-			return Database.getInstance().itemByType(type.toString());
+			int weight = container.getAmount() * container.getItemType().getweight();
+
+			int id = Database.getInstance().getFreeShelfSpace();
+			Location.LocationType level = Database.getInstance().getLevel(id);
+			return new ShelfType(id, level);
 		} catch (SQLException e) {
 			// TODO properly handle this
 			e.printStackTrace();
 		}
-		return -1;
+		return null;
+	}
+
+	public static ShelfType getItemLocation(ItemType type) {
+		try {
+			int id = Database.getInstance().itemByType(type.toString());
+			Location.LocationType level = Database.getInstance().getLevel(id);
+			return new ShelfType(id, level);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 }
