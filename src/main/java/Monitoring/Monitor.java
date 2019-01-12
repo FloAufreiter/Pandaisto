@@ -13,30 +13,79 @@ import warehouse.ShelfType;
 
 public class Monitor implements Runnable {
 
-    private static ArrayList<ItemContainer> ONGOING_ORDERS = new ArrayList<ItemContainer>();
+    private static ArrayList<ComponentOrder> ONGOING_ORDERS = new ArrayList<ComponentOrder>();
+    private static ArrayList<Supplier> SUPPLIER = new ArrayList<Supplier>();
+    
+    private static OnlineStore onlineStore = OnlineStore.getInstance();
 
-    private final Monitor monitor = new Monitor();
+    private static final Monitor monitor = new Monitor();
 
     private static boolean STOP = true;
 
     private static void createComponentOrder(int amount, ItemType itemType) {
-        ONGOING_ORDERS.add(new ItemContainer(amount, itemType));
+    	
+    		Supplier supplier;
+    		switch (itemType) {
+    		case SCREW: {supplier = SUPPLIER.get(1);
+    				break;}
+    		case RED_PAINT: {supplier = SUPPLIER.get(0);
+    				break;}
+    		case BLUE_PAINT: {supplier = SUPPLIER.get(0);
+			break;}
+    		case CAR_BODY: {supplier = SUPPLIER.get(4);
+			break;}
+    		case REMOTE: {supplier = SUPPLIER.get(2);
+			break;}
+    		case WHEEL: {supplier = SUPPLIER.get(3);
+			break;}
+			default:
+				supplier = SUPPLIER.get(4);
+    		
+    		
+    		}
+    	
+    	
+    	
+        ONGOING_ORDERS.add(new ComponentOrder(amount, itemType, supplier));
+    }
+    
+    public static void createCustomerOrder(int amount, ItemType itemType, Customer customer) {
+        onlineStore.createCustomerOrder(amount, itemType, customer);
     }
 
     private Monitor() {
+    	
+    		SUPPLIER.add(new Supplier("Paint-Rain GmbH"));
+    		SUPPLIER.add(new Supplier("We screw you GmbH"));
+    		SUPPLIER.add(new Supplier("We make Remote GmbH"));
+    		SUPPLIER.add(new Supplier("Wheels and Eals GmbH"));
+    		SUPPLIER.add(new Supplier("Some Body to Love AG"));
+    		SUPPLIER.add(new Supplier("Wholesaler"));
 
     }
 
     // Singleton - because only one Monitor is allowed.
-    public Monitor getInstance() {
+    public static Monitor getInstance() {
         return monitor;
+    }
+    
+    public static int getNumberOfOngoingComponentsOrders() {
+		return ONGOING_ORDERS.size();
+	}
+    
+    public int getDeliveryDays(int amount, ItemType type) {
+    		return onlineStore.checkAvailability(amount, type);
+    }
+    
+    public static int getNumberOfOngoingCustomerOrders() {
+    		return onlineStore.getNumberOfOngoingComponentsOrders();
     }
 
     @Override
     public void run() {
         while (!STOP) {
             if (!ONGOING_ORDERS.isEmpty()) {
-                order();
+                orderComponents();
             }
         }
     }
@@ -53,12 +102,14 @@ public class Monitor implements Runnable {
         createComponentOrder(amount, itemType);
     }
 
-    private static void order() {
-        for (ItemContainer c : ONGOING_ORDERS) {
-            OrderRunner r = new OrderRunner(c);
+    private static void orderComponents() {
+        for (ComponentOrder c : ONGOING_ORDERS) {
+            OrderRunner r = new OrderRunner(c.container);
             r.run();
         }
     }
+    
+   
 
     private static class OrderRunner implements Runnable {
         ItemContainer order; //TODE stopfe in andere Klasse
@@ -95,4 +146,6 @@ public class Monitor implements Runnable {
             }
         }
     }
+    
+    
 }

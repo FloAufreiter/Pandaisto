@@ -16,12 +16,12 @@ public class MonitoringInterface extends MessagingInterface {
 	 * @return number of items in stock, -1 in case of failure
 	 */
 	public int getItemStock(ItemType type) {
-//		try {
-//			//return Database.getInstance().itemsInStock(type.toString());
-//		} catch (SQLException e) {
-//			// TODO properly handle this
-//			e.printStackTrace();
-//		}
+		try {
+			return Database.getInstance().itemsInStock(type);
+		} catch (SQLException e) {
+			// TODO properly handle this
+			e.printStackTrace();
+		}
 		return -1;
 	}
 	

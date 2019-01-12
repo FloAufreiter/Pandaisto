@@ -3,21 +3,37 @@ package Monitoring;
 import java.util.ArrayList;
 
 import shared.ItemType;
+import warehouse.MonitoringInterface;
 
 public class OnlineStore {
 	
 	ArrayList<ItemType> soritment = new ArrayList<ItemType>();
 	
-	private static ArrayList<CustomerOrder> ongoingOrders = new ArrayList<CustomerOrder>();
+	private static ArrayList<CustomerOrder> ONGOING_ORDERS = new ArrayList<CustomerOrder>();
 	
+	private static OnlineStore onlineStore = new OnlineStore();
 	
+	private OnlineStore() {
+		
+	}
+	
+	public static OnlineStore getInstance() {
+		
+		return onlineStore;
+		
+	}
 	
 	public int checkAvailability(int amount, ItemType type) {
 		
 		// ask warehouse for stock information
-		boolean enoughInStock = true;
+		MonitoringInterface mi = new MonitoringInterface();
 		
-		if(enoughInStock) {
+		//int amountInStock = mi.getItemStock(type);
+		
+		int amountInStock = 1;
+		
+		
+		if(amountInStock > amount) {
 			return 5;
 		}
 		
@@ -36,7 +52,11 @@ public class OnlineStore {
 			Customer.customers.add(customer);
 		}
 			
-			ongoingOrders.add(new CustomerOrder(amount, itemType, customer));			
+		ONGOING_ORDERS.add(new CustomerOrder(amount, itemType, customer));			
+	}
+	
+	public int getNumberOfOngoingComponentsOrders() {
+		return ONGOING_ORDERS.size();
 	}
 	
 

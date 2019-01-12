@@ -11,7 +11,7 @@ public class Customer {
 	public static ArrayList<Customer> customers = new ArrayList<Customer>();
 	
 	
-	private Customer(String name,
+	public Customer(String name,
 	String password,
 	String address) {
 		

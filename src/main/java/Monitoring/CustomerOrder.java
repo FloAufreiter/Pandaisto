@@ -2,21 +2,21 @@ package Monitoring;
 
 import java.util.ArrayList;
 
+import shared.ItemContainer;
 import shared.ItemType;
 
 public class CustomerOrder extends Order{
 	
-	int amount;
-	ItemType itemType;
+	
 	Customer customer;
 	
+	ItemContainer container;
 	
 	
 	
 	public CustomerOrder(int amount, ItemType itemType, Customer customer) {
 		
-		this.amount = amount;
-		this.itemType = itemType;
+		this.container = new ItemContainer(amount, itemType);
 		this.customer = customer;
 	}
 	
