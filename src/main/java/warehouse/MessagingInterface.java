@@ -19,11 +19,12 @@ public abstract class MessagingInterface {
 	 */
 	public static ShelfType getFreeItemLocation(ItemContainer container) {
 		try {
-			int weight = container.getAmount() * container.getItemType().getweight();
-
 			int id = Database.getInstance().getFreeShelf();
+			System.out.println("ID "+ id);
 			Location.LocationType level = Database.getInstance().getLevel(id);
-			return new ShelfType(id, level);
+			ShelfType s = new ShelfType(id, level);
+			System.out.println(s);
+			return s;
 		} catch (SQLException e) {
 			// TODO properly handle this
 			e.printStackTrace();

@@ -20,9 +20,9 @@ public class Monitor implements Runnable {
 
     private static final Monitor monitor = new Monitor();
 
-    private static boolean STOP = true;
+    private boolean STOP = true;
 
-    private static void createComponentOrder(int amount, ItemType itemType) {
+    private void createComponentOrder(int amount, ItemType itemType) {
     	
     		Supplier supplier;
     		switch (itemType) {
@@ -44,12 +44,13 @@ public class Monitor implements Runnable {
     		
     		}
     	
-    	
+    	System.out.println("duh");
     	
         ONGOING_ORDERS.add(new ComponentOrder(amount, itemType, supplier));
+        orderComponents();
     }
     
-    public static void createCustomerOrder(int amount, ItemType itemType, Customer customer) {
+    public void createCustomerOrder(int amount, ItemType itemType, Customer customer) {
         onlineStore.createCustomerOrder(amount, itemType, customer);
     }
 
@@ -69,7 +70,7 @@ public class Monitor implements Runnable {
         return monitor;
     }
     
-    public static int getNumberOfOngoingComponentsOrders() {
+    public int getNumberOfOngoingComponentsOrders() {
 		return ONGOING_ORDERS.size();
 	}
     
@@ -77,7 +78,7 @@ public class Monitor implements Runnable {
     		return onlineStore.checkAvailability(amount, type);
     }
     
-    public static int getNumberOfOngoingCustomerOrders() {
+    public int getNumberOfOngoingCustomerOrders() {
     		return onlineStore.getNumberOfOngoingComponentsOrders();
     }
 
@@ -90,19 +91,19 @@ public class Monitor implements Runnable {
         }
     }
 
-    public static void start() {
+    public void start() {
         STOP = false;
     }
 
-    public static void stop() {
+    public void stop() {
         STOP = true;
     }
 
-    public static void orderComponents(ItemType itemType, int amount) {
+    public void orderComponents(ItemType itemType, int amount) {
         createComponentOrder(amount, itemType);
     }
 
-    private static void orderComponents() {
+    private void orderComponents() {
         for (ComponentOrder c : ONGOING_ORDERS) {
             OrderRunner r = new OrderRunner(c.container);
             r.run();
@@ -122,23 +123,29 @@ public class Monitor implements Runnable {
         public void run() {
             try {
                 Thread.sleep(10000);
+                System.out.println("runs");
                 TaskScheduler ts = AGV.getInstance().getAGVTaskScheduler();
                 //TODO which Order IF
                 boolean task_created = false;
                 ShelfType st = null;
                 Location l1 = Area.getLocation(Location.LocationType.LOADING_DOCK, 0); //TODO random which loading 0-3
-                Location l2 = Area.getLocation(st.getType(), st.getId());
+                Location l2;
                 while(st == null) {
                     //ask Warehouse where to bring
                     st = MonitoringInterface.getFreeItemLocation(order);
                     if(st == null) Thread.sleep(10000);
-                    while (!task_created) {
-                        for(int i = 0; i < order.getAmount(); i++) {
-                            task_created = ts.createTask(l1, l2, order.getItemType());
-                        }
-                        if (task_created) {
-                            ONGOING_ORDERS.remove(order);
-                        }
+                    else {
+                    	System.out.println(st);
+                    	l2 = Area.getLocation(st.getType(), st.getId());
+                    
+	                    while (!task_created) {
+	                        for(int i = 0; i < order.getAmount(); i++) {
+	                            task_created = ts.createTask(l1, l2, order.getItemType());
+	                        }
+	                        if (task_created) {
+	                            ONGOING_ORDERS.remove(order);
+	                        }
+	                    }
                     }
                 }
             } catch (InterruptedException e) {

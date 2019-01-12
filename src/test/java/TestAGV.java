@@ -38,7 +38,37 @@ public class TestAGV {
         assertEquals(1, Database.getInstance().itemsInStock(ItemType.CAR_BODY));
         Database.getInstance().deleteItem(50000);
         assertEquals(0, Database.getInstance().itemsInStock(ItemType.CAR_BODY));
-
+        Database.getInstance().deleteWarehouse(4);
     }
-
+    
+    @Test
+    public void checkItemStock() throws SQLException {
+    	Database db = Database.getInstance();
+    	db.insertWarehouse(10, 100);
+    	for(int i = 0; i < 100; i ++) db.insertShelf(i+1000, 10, 0);
+    	for(int i = 0; i < 100; i++) db.insertItem(i+1000, ItemType.RED_PAINT);
+    	assertEquals(100, db.itemsInStock(ItemType.RED_PAINT));
+    	db.deleteWarehouse(10);
+    	assertEquals(0, db.itemsInStock(ItemType.RED_PAINT));
+    }
+    
+    public void checkCorrectItem() throws SQLException {
+    	Database db = Database.getInstance();
+    }
+    
+    @Test
+    public void testItemReorder() throws SQLException, InterruptedException {
+    	Database db = Database.getInstance();
+    	AGV a = AGV.getInstance();
+    	a.startAGV();
+    	for(int i = 0; i < 60; i++) {
+    		db.insertItem(i, ItemType.SCREW);
+    	}
+    	assertEquals(60, db.itemsInStock(ItemType.SCREW));
+    	for(int i = 0; i < 31; i++) db.deleteItem(i);
+    	Thread.sleep(10000);
+//    	a.stopAGV();
+//        AGV.getSchedulerThread().join();
+    	assertEquals(59, db.itemsInStock(ItemType.SCREW));
+    }
 }

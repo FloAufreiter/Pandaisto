@@ -8,7 +8,7 @@ import shared.ItemType;
  *
  */
 class DBEvent {
-	final ItemType itemType; 
+	final ItemType itemType;
 	final EventType eType;
 	
 	public DBEvent(EventType eType, ItemType itemType) {

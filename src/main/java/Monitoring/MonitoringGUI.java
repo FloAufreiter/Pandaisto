@@ -169,8 +169,8 @@ public class MonitoringGUI {
 						
 					}
 
-					lblOngoingOrders.setText("Ongoing Customer Orders:" + Monitor.getNumberOfOngoingCustomerOrders());
-					lblOngoingComponentOrders.setText("Ongoing Component Orders:" + Monitor.getNumberOfOngoingComponentsOrders());
+					lblOngoingOrders.setText("Ongoing Customer Orders:" + Monitor.getInstance().getNumberOfOngoingCustomerOrders());
+					lblOngoingComponentOrders.setText("Ongoing Component Orders:" + Monitor.getInstance().getNumberOfOngoingComponentsOrders());
 				}
 
 			}

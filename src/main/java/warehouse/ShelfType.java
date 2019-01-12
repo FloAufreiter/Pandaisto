@@ -1,22 +1,23 @@
 package warehouse;
 
 import AGV.Location;
+import AGV.Location.LocationType;
 
 public class ShelfType {
     private int id;
-
+    private LocationType type;
+    
     public int getId() {
         return id;
     }
 
-    public Location.LocationType getType() {
+    public LocationType getType() {
         return type;
     }
 
-    private Location.LocationType type;
 
     ShelfType(int id , Location.LocationType type) {
-        id = id;
-        type = type;
+        this.id = id;
+        this.type = type;
     }
 }

@@ -1,5 +1,5 @@
 package warehouse;
 
 public enum EventType {
-		ItemAdded, ItemRemoved
+		ItemAdded, ItemRemoved;
 }

@@ -9,7 +9,8 @@ import java.util.concurrent.*;
 public class TaskScheduler implements Runnable {
 
     ExecutorService executorService = Executors.newFixedThreadPool(10);
-
+    ArrayList<Thread> pool = new ArrayList<>(10);
+    
     public void stopScheduler() {
         STOP_AGV = true;
     }
@@ -50,7 +51,9 @@ public class TaskScheduler implements Runnable {
                 }
                 nearest_free.addTask(t);
                 if (nearest_free.isFullyLoaded()) {
-                    executorService.execute(nearest_free);
+                    new Thread(nearest_free).start();
+                	
+                    //executorService.execute(nearest_free);
                     freeLifters.remove(nearest_free);
                 }
             } catch (InterruptedException e) {
@@ -60,7 +63,7 @@ public class TaskScheduler implements Runnable {
         if (!freeLifters.isEmpty()) {
             for (Forklift f : freeLifters) {
                 if(!f.loadingRouteEmpty()) {
-                    executorService.execute(f);
+                    new Thread(f).start();
                 }
             }
         }
@@ -95,9 +98,7 @@ public class TaskScheduler implements Runnable {
     @Override
     public void run() {
         while (!STOP_AGV || !tasks.isEmpty() ) {
-            if (!tasks.isEmpty()) {
                 scheduleTasksToForklift();
-            }
         }
         executorService.shutdown();
         try {

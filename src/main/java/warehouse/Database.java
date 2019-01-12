@@ -102,7 +102,8 @@ public class Database {
     	listeners = new ArrayList<>();
     	p = new PathOrganizer();
     	this.addListener(p);
-    	new BackupManager(1, System.getProperty("user.dir"), "/home//tom/eclipse-workspace/sweng").start();
+    	this.addListener(new StockManager());
+    	//new BackupManager(1, System.getProperty("user.dir"), "/home//tom/eclipse-workspace/sweng").start();
     	
     }
     
@@ -149,7 +150,7 @@ public class Database {
 				insertShelfStmt.setInt(2, warehouseID);
 				insertShelfStmt.setInt(3, level);
 				insertShelfStmt.executeUpdate();
-
+				System.out.println(shelfID);
     		} catch(SQLException e) {
 				return ! deleteShelf(shelfID);
     		}
@@ -210,10 +211,10 @@ public class Database {
     		try {
 		    		deleteShelfStmt.setInt(1, shelfID);
 		    		deleteShelfStmt.executeUpdate();
+		    		return true;
     		} catch(SQLException e) {
     			return false;
     		} 
-    		return true;
 		}
     }
     
@@ -223,12 +224,11 @@ public class Database {
      * @param type
      * @return
      */
-    public boolean insertItem(int shelfSpaceID, ItemType type) {
+    public boolean insertItem(int shelfID, ItemType type) {
+    	synchronized (insertItemStmt) {
     	try {
-    		System.out.println("ShelfID:"+shelfSpaceID);
-    		if(shelfSpaceID < 0) return false; //TODO: alarm delivery organizer (in general introduce events)
     		insertItemStmt.setString(1, type.toString());
-	    	insertItemStmt.setInt(2, shelfSpaceID);
+	    	insertItemStmt.setInt(2, shelfID);
 	    	insertItemStmt.executeUpdate();
     	} catch(SQLException e) {
     		e.printStackTrace();
@@ -236,6 +236,7 @@ public class Database {
     	}
     	fireEvent(EventType.ItemAdded, type);
     	return true;
+    	}
     }
     
     /**
@@ -359,7 +360,6 @@ public class Database {
     	}
 
     private void fireEvent(EventType eType, ItemType itemType) {
-    	
     	DBEvent e = new DBEvent(eType, itemType);
     	for(DBListener l: listeners) l.notifyEvent(e);
     }
@@ -368,7 +368,7 @@ public class Database {
 		synchronized (freeShelfStmt) {
 			ResultSet res = freeShelfStmt.executeQuery();
 			if(res.next()) {
-				return res.getInt("shelfspaceid");
+				return res.getInt("shelfid");
 			}
 		}
 		return -1;
