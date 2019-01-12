@@ -1,16 +1,15 @@
 package conveyor;
 
-import java.util.concurrent.TimeUnit;
-import assembly_robot_arms.Item;
+import shared.ItemType;
 
-public class BeltControlleSystem implements Runnable{
+public class BeltControlSystem implements Runnable{
 	private final BeltSegment beltStart;
 	private final LubricantControll lubController;
-	private static BeltControlleSystem bcs;
+	private static BeltControlSystem bcs;
 	
 	private static boolean STOP = true;
 	
-	private BeltControlleSystem(float minLubPressure, float maxConveyorSpeed){
+	private BeltControlSystem(float minLubPressure, float maxConveyorSpeed){
 		lubController = new LubricantControll(minLubPressure);
 		//init conveyor belt segments
 		int id = 0;
@@ -21,9 +20,9 @@ public class BeltControlleSystem implements Runnable{
 		}        
 		beltStart = curr;
 	}
-	public static BeltControlleSystem getInstance(float minLubPressure, float maxConveyorSpeed) {
+	public static BeltControlSystem getInstance(float minLubPressure, float maxConveyorSpeed) {
 		if(bcs == null) {
-			return new BeltControlleSystem(minLubPressure, maxConveyorSpeed);
+			return new BeltControlSystem(minLubPressure, maxConveyorSpeed);
 		}
 		return bcs;
 	}
@@ -56,12 +55,12 @@ public class BeltControlleSystem implements Runnable{
 		return null;
 	}
 	
-	public Item removeItemAt(int beltID) {
+	public ItemType removeItemAt(int beltID) {
 		synchronized(this) {
 			return getBeltSegment(beltID).removeItem();
 		}
 	}
-	public boolean addItemAt(int beltID, Item item) {
+	public boolean addItemAt(int beltID, ItemType item) {
 		synchronized(this) {
 			return getBeltSegment(beltID).addItem(item); //this will change a bit when the ItemType is added
 		}
@@ -79,7 +78,7 @@ public class BeltControlleSystem implements Runnable{
 			if(curr.isEmpty()) {
 				System.out.println("0\t " + curr.getBeltID());
 			}else {
-				System.out.println("temp" + "\t " + curr.getBeltID());
+				System.out.println(curr.getItemType().toString() + "\t " + curr.getBeltID());
 			}
 		}
 		System.out.println("End");	
@@ -89,14 +88,14 @@ public class BeltControlleSystem implements Runnable{
 	public void run() {
 		while(!STOP) {
 			try {
-				Thread.sleep(4000); //TODO make this delay something that makes more sence
+				Thread.sleep(3000); //TODO make this delay something that makes more sence
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			printConveyor();
 			synchronized(this) {
 				moveAllBeltsForward();
 			}
-			printConveyor();
 			lubController.updateLubLevels();
 		}
 	}
@@ -108,5 +107,9 @@ public class BeltControlleSystem implements Runnable{
 	public static void stop() {
 		STOP = true;
 	}
-	
+
+	public void lockBeltAt(int beltId){
+		getBeltSegment(beltId);
+	}
+
 }

@@ -1,13 +1,6 @@
 package assembly_robot_arms;
 
-import java.awt.BorderLayout;
-
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-
-import conveyor.BeltControlleSystem;
 
 public class GUI extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -23,15 +16,15 @@ public class GUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 	
-	public static void main(String[] args) {
-		BeltControlleSystem belt = BeltControlleSystem.getInstance(10,100);
-		belt.start();
-		Scheduler s = Scheduler.getInstance(belt);
-		s.start();
-		Thread t1 = new Thread(s);
-		t1.start();
-		t1 = new Thread(belt);
-		t1.start();
+//	public static void main(String[] args) {
+//		BeltControlSystem belt = BeltControlSystem.getInstance(10,100);
+//		belt.start();
+//		RobotScheduler s = RobotScheduler.getInstance(belt);
+//		s.start();
+//		Thread t1 = new Thread(s);
+//		t1.start();
+//		t1 = new Thread(belt);
+//		t1.start();
 		
 		
 		/*GUI gui = new GUI();
@@ -59,5 +52,5 @@ public class GUI extends JFrame {
 		gui.getContentPane().add(p);
 		gui.pack();
 		gui.setVisible(true);*/
-    }
+   // }
 }

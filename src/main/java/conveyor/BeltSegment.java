@@ -1,6 +1,6 @@
 package conveyor;
-import shared.*;
-import assembly_robot_arms.Item;
+
+import shared.ItemType;
 
 public class BeltSegment {
 
@@ -8,7 +8,7 @@ public class BeltSegment {
 	private final float maxSpeed;
 	private float currentSpeed;
 	private final int beltID;
-	private Item item = null;
+	private ItemType item = null;
 	private boolean locked = false;
 	
 	public BeltSegment(BeltSegment successor, int beltID, float maxSpeed) {
@@ -17,21 +17,23 @@ public class BeltSegment {
 		this.currentSpeed = 0;
 		this.maxSpeed = maxSpeed;
 	}
-	
+	public ItemType getItemType(){
+		return item;
+	}
 	public BeltSegment getSuccessor() {
 		return successor;
 	}
 	
-	public boolean addItem(Item item) {
+	public boolean addItem(ItemType item) {
+		unlockSegment();
 		if(isEmpty()) {
 			this.item = item;
 			return true;
 		}
-		unlockSegment();
 		return false;
 	}
 	
-	public void cshangeSpeed(float speed) {
+	public void changeSpeed(float speed) {
 		if(speed <= maxSpeed) {
 			currentSpeed = speed;
 		} else {
@@ -51,18 +53,16 @@ public class BeltSegment {
 	}
 	
 	public boolean moveToSuccessor(){
-		if(!locked && successor != null && successor.isEmpty()) {
+		if(successor != null && !successor.locked && successor.isEmpty()) {
 			successor.addItem(removeItem());
 			return true;
 		}
 		return false;
 	}
 	
-	public Item removeItem(){
+	public ItemType removeItem(){
 		if(isEmpty()) return null;
-		//This might not be right
-		lockSegment();
-		Item temp = item;
+		ItemType temp = item;
 		item = null;	
 		return temp;
 	}
