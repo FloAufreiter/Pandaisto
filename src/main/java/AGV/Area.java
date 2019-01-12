@@ -31,7 +31,7 @@ public class Area {
 
     public static Location getLocation(Location.LocationType type, int id) {
         switch (type) {
-            case FLOORSHELF:
+            case FLOORSHELF: case TOPSHELF1: case TOPSHELF2:
                 return SHELVES.get(id);
             case PRODUCTION_LINE:
                 return ROBOT_ARMS.get(id);

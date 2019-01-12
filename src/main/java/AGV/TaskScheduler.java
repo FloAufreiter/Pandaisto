@@ -1,19 +1,17 @@
 package AGV;
 
-import shared.Commodity;
-import shared.ItemContainer;
 import shared.ItemType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.*;
 
 public class TaskScheduler implements Runnable {
 
+    ExecutorService executorService = Executors.newFixedThreadPool(10);
+
     public void stopScheduler() {
         STOP_AGV = true;
-        System.out.println(tasks.isEmpty());
     }
 
     private boolean STOP_AGV = false;
@@ -52,7 +50,7 @@ public class TaskScheduler implements Runnable {
                 }
                 nearest_free.addTask(t);
                 if (nearest_free.isFullyLoaded()) {
-                    nearest_free.execute();
+                    executorService.execute(nearest_free);
                     freeLifters.remove(nearest_free);
                 }
             } catch (InterruptedException e) {
@@ -61,7 +59,9 @@ public class TaskScheduler implements Runnable {
         }
         if (!freeLifters.isEmpty()) {
             for (Forklift f : freeLifters) {
-                f.execute();
+                if(!f.loadingRouteEmpty()) {
+                    executorService.execute(f);
+                }
             }
         }
     }
@@ -94,10 +94,16 @@ public class TaskScheduler implements Runnable {
 
     @Override
     public void run() {
-        while (!STOP_AGV || !tasks.isEmpty()) {
+        while (!STOP_AGV || !tasks.isEmpty() ) {
             if (!tasks.isEmpty()) {
                 scheduleTasksToForklift();
             }
+        }
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(1, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

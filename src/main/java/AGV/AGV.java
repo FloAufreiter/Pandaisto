@@ -7,6 +7,12 @@ import java.awt.*;
 
 public class AGV {
     private static TaskScheduler scheduler;
+
+    public static Thread getSchedulerThread() {
+        return schedulerThread;
+    }
+
+    private static Thread schedulerThread;
     private static Area area;
     static private DefaultTableModel model;
     static private JTable table;
@@ -28,7 +34,8 @@ public class AGV {
 
     public void startAGV() {
         openGui();
-        new Thread(scheduler).start();
+        schedulerThread = new Thread(scheduler);
+        schedulerThread.start();
     }
 
     public void stopAGV() {
@@ -37,7 +44,7 @@ public class AGV {
 
     static void openGui() {
         JFrame frame = new JFrame("My First GUI");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(1000,400);
         String[] colNames = {"ID", "Availability Status", "Current Location"};
         model = new DefaultTableModel(colNames, 0);

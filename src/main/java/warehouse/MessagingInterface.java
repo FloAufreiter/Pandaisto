@@ -21,7 +21,7 @@ public abstract class MessagingInterface {
 		try {
 			int weight = container.getAmount() * container.getItemType().getweight();
 
-			int id = Database.getInstance().getFreeShelfSpace();
+			int id = Database.getInstance().getFreeShelf();
 			Location.LocationType level = Database.getInstance().getLevel(id);
 			return new ShelfType(id, level);
 		} catch (SQLException e) {

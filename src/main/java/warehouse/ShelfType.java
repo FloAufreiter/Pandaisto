@@ -18,6 +18,5 @@ public class ShelfType {
     ShelfType(int id , Location.LocationType type) {
         id = id;
         type = type;
-
     }
 }

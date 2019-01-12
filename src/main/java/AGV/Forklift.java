@@ -1,6 +1,4 @@
 package AGV;
-
-import shared.ItemContainer;
 import shared.ItemType;
 import warehouse.AGVInterface;
 
@@ -48,12 +46,8 @@ class Forklift implements Runnable {
         IN_USE
     }
 
-
-    void execute() {
-        if(loadingRoute.getStops().isEmpty()) {
-            return;
-        }
-        new Thread(this, String.valueOf(id)).run();
+    boolean loadingRouteEmpty () {
+        return loadingRoute.getStops().isEmpty();
     }
 
     @Override
@@ -82,7 +76,7 @@ class Forklift implements Runnable {
                     System.out.println("done " + t.getId());
                     break;
                 case finished:
-                    return;
+                    break;
             }
             route.getStops().remove(nearest);
             currentLocation = nearest;
@@ -154,12 +148,15 @@ class Forklift implements Runnable {
             switch(location.getType()) {
                 case FLOORSHELF:
                     AGVInterface.confirmItemAdded(location.getId(), it);
+                    break;
                 case TOPSHELF1:
                     setForkHeight(FORKHEIGHT_1);
                     AGVInterface.confirmItemAdded(location.getId(), it);
+                    break;
                 case TOPSHELF2:
                     setForkHeight(FORKHEIGHT_2);
                     AGVInterface.confirmItemAdded(location.getId(), it);
+                    break;
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
