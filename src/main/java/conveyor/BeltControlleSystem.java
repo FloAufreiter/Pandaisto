@@ -1,13 +1,12 @@
 package conveyor;
 
 import java.util.concurrent.TimeUnit;
-
-import shared.Commodity;
+import assembly_robot_arms.Item;
 
 public class BeltControlleSystem implements Runnable{
 	private final BeltSegment beltStart;
 	private final LubricantControll lubController;
-	private BeltControlleSystem bcs;
+	private static BeltControlleSystem bcs;
 	
 	private static boolean STOP = true;
 	
@@ -16,13 +15,13 @@ public class BeltControlleSystem implements Runnable{
 		//init conveyor belt segments
 		int id = 0;
 		BeltSegment curr = new BeltSegment(null, id, maxConveyorSpeed);
-		for(int i = 0 ; i < 10; i++) {
+		for(int i = 1 ; i <= 16; i++) {
 			id++;
 			curr = new BeltSegment(curr, id, maxConveyorSpeed);
 		}        
 		beltStart = curr;
 	}
-	public BeltControlleSystem getInstance(float minLubPressure, float maxConveyorSpeed) {
+	public static BeltControlleSystem getInstance(float minLubPressure, float maxConveyorSpeed) {
 		if(bcs == null) {
 			return new BeltControlleSystem(minLubPressure, maxConveyorSpeed);
 		}
@@ -57,11 +56,21 @@ public class BeltControlleSystem implements Runnable{
 		return null;
 	}
 	
-	public boolean addItemAt(int beltID, Commodity item) {
-		return getBeltSegment(beltID).addItem(item); //this will change a bit when the ItemType is added
+	public Item removeItemAt(int beltID) {
+		synchronized(this) {
+			return getBeltSegment(beltID).removeItem();
+		}
+	}
+	public boolean addItemAt(int beltID, Item item) {
+		synchronized(this) {
+			return getBeltSegment(beltID).addItem(item); //this will change a bit when the ItemType is added
+		}
 	}
 	
-	
+	public boolean isEmpty(int beltID) {
+		return getBeltSegment(beltID).isEmpty();
+		
+	}
 	public void printConveyor() {
 		System.out.println("Start");
 		for(BeltSegment curr = beltStart;
@@ -80,11 +89,13 @@ public class BeltControlleSystem implements Runnable{
 	public void run() {
 		while(!STOP) {
 			try {
-				Thread.sleep(4000);
+				Thread.sleep(4000); //TODO make this delay something that makes more sence
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			moveAllBeltsForward();
+			synchronized(this) {
+				moveAllBeltsForward();
+			}
 			printConveyor();
 			lubController.updateLubLevels();
 		}

@@ -1,14 +1,24 @@
 package assembly_robot_arms;
 
-public abstract class RobotArm {
+import static assembly_robot_arms.RobotArm.STOP;
+
+import shared.ItemType;
+
+public abstract class RobotArm implements Runnable {
 	private int x, y, z;
 	private long timeLastMalfunction, timeLastMaintanence;
 	private String title, text;
+	protected ItemType type;
+	protected static boolean STOP = false;
 	
 	public RobotArm() {
 		this.x = 0;
 		this.y = 0;
 		this.z = 0;
+	}
+	
+	public void setItemType(ItemType type) {
+		this.type = type;
 	}
 	
 	public int getX() {
@@ -48,5 +58,12 @@ public abstract class RobotArm {
 		text = "Start with Assembling of Product 1...";
 		
 		new InformationHandling(title, text).send();
+	}
+	public void start() {
+		STOP = false;
+	}
+	
+	public void stop() {
+		STOP = true;
 	}
 }

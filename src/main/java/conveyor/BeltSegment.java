@@ -1,5 +1,6 @@
 package conveyor;
 import shared.*;
+import assembly_robot_arms.Item;
 
 public class BeltSegment {
 
@@ -7,7 +8,8 @@ public class BeltSegment {
 	private final float maxSpeed;
 	private float currentSpeed;
 	private final int beltID;
-	private Commodity com = null;
+	private Item item = null;
+	private boolean locked = false;
 	
 	public BeltSegment(BeltSegment successor, int beltID, float maxSpeed) {
 		this.successor = successor;
@@ -20,19 +22,16 @@ public class BeltSegment {
 		return successor;
 	}
 	
-	public int getItemID() {
-		return com.getId();
-	}
-	
-	public boolean addItem(Commodity com) {
+	public boolean addItem(Item item) {
 		if(isEmpty()) {
-			this.com = com;
+			this.item = item;
 			return true;
 		}
+		unlockSegment();
 		return false;
 	}
 	
-	public void changeSpeed(float speed) {
+	public void cshangeSpeed(float speed) {
 		if(speed <= maxSpeed) {
 			currentSpeed = speed;
 		} else {
@@ -41,22 +40,30 @@ public class BeltSegment {
 	}
 		
 	public boolean isEmpty(){
-		return (com == null);
+		return (item == null);
+	}
+	
+	public void lockSegment() {
+		locked = true;
+	}
+	public void unlockSegment() {
+		locked = false;
 	}
 	
 	public boolean moveToSuccessor(){
-		if(successor != null && successor.isEmpty()) {
+		if(!locked && successor != null && successor.isEmpty()) {
 			successor.addItem(removeItem());
 			return true;
 		}
 		return false;
 	}
 	
-	public Commodity removeItem(){
+	public Item removeItem(){
 		if(isEmpty()) return null;
-		
-		Commodity temp = com;
-		com = null;	
+		//This might not be right
+		lockSegment();
+		Item temp = item;
+		item = null;	
 		return temp;
 	}
 	
