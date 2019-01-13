@@ -3,40 +3,48 @@ import assembly_robot_arms.RobotScheduler;
 import org.junit.Test;
 import shared.ItemType;
 import AGV.Location;
+import Monitoring.Monitor;
+import Monitoring.MonitoringGUI;
 import AGV.Area;
 import warehouse.Database;
+import warehouse.ShelfType;
+import warehouse.AGVInterface;
 
+import java.awt.EventQueue;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertEquals;
 
 public class TestAGV {
 
+	@Test 
+	public void testInitDB() throws SQLException, InterruptedException {
+		Database db = Database.getInstance();
+		db.initTestDB();
+		assertEquals(20, db.itemsInStock(ItemType.BLUE_PAINT));
+		db.deleteTestDB();
+	}
+	
     @Test
     public void testCommunicationAGVWarehouse() throws SQLException, InterruptedException {
         AGV agv = AGV.getInstance();
-        Database.getInstance().insertItem(0, ItemType.CAR_BODY);
-        Database.getInstance().insertItem(1, ItemType.RED_PAINT);
+        Database.getInstance().initTestDB();
         //add enough items so no reorder is triggered
-        for(int i = 2; i < 20; i ++) Database.getInstance().insertItem(i, ItemType.RED_PAINT);
-
-        for(int i = 22; i < 40; i ++) Database.getInstance().insertItem(i, ItemType.CAR_BODY);
         
         Location l1 = Area.getLocation(Location.LocationType.FLOORSHELF, 0);
         Location r1 = Area.getLocation(Location.LocationType.PRODUCTION_LINE, 1);
         Location l2 = Area.getLocation(Location.LocationType.TOPSHELF1, 1);
-        Location l3 = Area.getLocation(Location.LocationType.FLOORSHELF, 3);
+        Location l3 = Area.getLocation(Location.LocationType.FLOORSHELF, 33);
         
         agv.startAGV();
 
-        agv.getAGVTaskScheduler().createTask(l1, r1, ItemType.CAR_BODY);
+//        agv.getAGVTaskScheduler().createTask(l1, r1, ItemType.SCREW);
         Thread.sleep(1000);
-        agv.getAGVTaskScheduler().createTask(l2, l3, ItemType.RED_PAINT);
-        Thread.sleep(10000);//sleep to make sure 2 forklifts are started
-        assertEquals(18, Database.getInstance().itemsInStock(ItemType.CAR_BODY));
-        assertEquals(18, Database.getInstance().itemsInStock(ItemType.RED_PAINT));
-        Database.getInstance().deleteWarehouse(0);
+        agv.getAGVTaskScheduler().createTask(l2, l3, ItemType.SCREW);
+        Thread.sleep(20000);//sleep to make sure 2 forklifts are started
+        assertEquals(5, Database.getInstance().itemsInStock(ItemType.SCREW));
         agv.stopAGV();
+        Database.getInstance().deleteWarehouse(0);
     }
 
     @Test
@@ -67,15 +75,11 @@ public class TestAGV {
     public void testCommunicationAGVWithRobotArms() throws SQLException, InterruptedException {
         AGV agv = AGV.getInstance();
         RobotScheduler.getInstance().startRobotArms();
-        Database.getInstance().insertItem(0, ItemType.CAR_BODY);
-        Database.getInstance().insertItem(1, ItemType.RED_PAINT);
-        for(int i = 2; i < 20; i ++) Database.getInstance().insertItem(i, ItemType.RED_PAINT);
-
-        for(int i = 22; i < 40; i ++) Database.getInstance().insertItem(i, ItemType.CAR_BODY);
-        
+        Database.getInstance().initTestDB();	 
         Location l1 = Area.getLocation(Location.LocationType.FLOORSHELF, 0);
         Location r0 = Area.getLocation(Location.LocationType.PRODUCTION_LINE, 0);
-        Location l2 = Area.getLocation(Location.LocationType.TOPSHELF1, 1);
+        ShelfType s = AGVInterface.getItemLocation(ItemType.RED_PAINT);
+        Location l2 = Area.getLocation(s.getType(), s.getId());
         Location r4 = Area.getLocation(Location.LocationType.PRODUCTION_LINE, 4);
         agv.startAGV();
         agv.getAGVTaskScheduler().createTask(l1, r0, ItemType.CAR_BODY);
@@ -88,6 +92,7 @@ public class TestAGV {
         //check if Database is consistent
         assertEquals(18, Database.getInstance().itemsInStock(ItemType.CAR_BODY));
         assertEquals(18, Database.getInstance().itemsInStock(ItemType.RED_PAINT));
+        Database.getInstance().deleteTestDB();
 	}
     public void checkCorrectItem() throws SQLException {
     	Database db = Database.getInstance();
@@ -96,19 +101,17 @@ public class TestAGV {
     @Test
     public void testItemReorder() throws SQLException, InterruptedException {
     	Database db = Database.getInstance();
+    	db.initTestDB();
     	AGV a = AGV.getInstance();
     	a.startAGV();
-    	for(int i = 0; i < 10; i++) {
-    		db.insertItem(i, ItemType.SCREW);
-    	}
-    	assertEquals(10, db.itemsInStock(ItemType.SCREW));
-    	for(int i = 0; i < 10; i++) db.deleteItem(i);
+    	assertEquals(20, db.itemsInStock(ItemType.SCREW));
+    	for(int i = 0; i < 11; i++) db.deleteItem(i);
     	Thread.sleep(60000); //wait long enough for forklifts 
 //    	a.stopAGV();
 //        AGV.getSchedulerThread().join();
-    	assertEquals(10, db.itemsInStock(ItemType.SCREW));
-    	db.deleteWarehouse(0);
+    	assertEquals(19, db.itemsInStock(ItemType.SCREW));
     	a.stopAGV();
+    	db.deleteTestDB();
     }
     
     @Test
@@ -123,4 +126,41 @@ public class TestAGV {
     	db.deleteWarehouse(10); //cleanup
 
     }
+    
+    //THIS SHOULD BE IN MONITOR BUT DEPENDENCIES ARE FUCKED
+public static void main(String[] args) {
+		
+	Monitor.getInstance();
+		try {
+			Database.getInstance().initTestDB();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			System.exit(-1); //SHIT
+		}
+		Location l1 = Area.getLocation(Location.LocationType.FLOORSHELF, 0);
+        Location r1 = Area.getLocation(Location.LocationType.PRODUCTION_LINE, 1);
+        Location l2 = Area.getLocation(Location.LocationType.TOPSHELF1, 1);
+        Location l3 = Area.getLocation(Location.LocationType.FLOORSHELF, 3);
+        
+        AGV agv = AGV.getInstance();
+        agv.getAGVTaskScheduler().createTask(l1, r1, ItemType.SCREW);
+        try {
+			Thread.sleep(1000);
+			agv.getAGVTaskScheduler().createTask(l2, l3, ItemType.SCREW);
+	        Thread.sleep(10000);//sleep to make sure 2 forklifts are started
+	        
+        } catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        try {
+			Database.getInstance().deleteWarehouse(0);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		while(true) {
+			
+		}	
+	}
 }

@@ -28,10 +28,7 @@ public class OnlineStore {
 		// ask warehouse for stock information
 		MonitoringInterface mi = new MonitoringInterface();
 		
-		//int amountInStock = mi.getItemStock(type);
-		
-		int amountInStock = 1;
-		
+		int amountInStock = mi.getItemStock(type);
 		
 		if(amountInStock > amount) {
 			return 5;
@@ -40,7 +37,7 @@ public class OnlineStore {
 		else {
 			
 			// we can produce 2000 cars a day
-			int estimatedDelivery = 5 + amount/2000;
+			int estimatedDelivery = 5 + (int)Math.ceil(amount/2000d);
 			
 			return estimatedDelivery;
 		}	

@@ -15,10 +15,12 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.awt.FlowLayout;
 
 
 import shared.ItemType;
+import warehouse.Database;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -28,7 +30,7 @@ import javax.swing.JList;
 
 public class MonitoringGUI {
 
-	private JFrame frame;
+	public JFrame frame;
 	private JTextField textField;
 	private JTextField textField_1;
 	private JLabel lblOngoingOrders = new JLabel("Ongoing Customer Orders: 0");
@@ -40,6 +42,13 @@ public class MonitoringGUI {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
+		try {
+			Database.getInstance().initTestDB();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			System.exit(-1); //SHIT
+		}
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {

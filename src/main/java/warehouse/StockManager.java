@@ -21,8 +21,8 @@ public class StockManager implements DBListener{
 	
 	StockManager() {
 		for(ItemType t: ItemType.values()) {
-			criticalStock.put(t, 10);
-			reorderAmount.put(t, 10);
+			criticalStock.put(t, 3);
+			reorderAmount.put(t, 3);
 			deliveryPending.put(t, false);
 		}
 	}

@@ -1,5 +1,7 @@
 package Monitoring;
 
+import java.awt.EventQueue;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -7,8 +9,10 @@ import AGV.AGV;
 import AGV.Area;
 import AGV.Location;
 import AGV.TaskScheduler;
+import assembly_robot_arms.RobotScheduler;
 import shared.ItemContainer;
 import shared.ItemType;
+import warehouse.Database;
 import warehouse.MonitoringInterface;
 import warehouse.ShelfType;
 
@@ -19,7 +23,11 @@ public class Monitor implements Runnable {
     
     private static OnlineStore onlineStore = OnlineStore.getInstance();
 
-    private static final Monitor monitor = new Monitor();
+    private static Monitor monitor;
+    
+    private static Database warehouse;
+    private static AGV agv;
+    private static RobotScheduler rob;
 
     private boolean STOP = true;
 
@@ -62,11 +70,34 @@ public class Monitor implements Runnable {
     		SUPPLIER.add(new Supplier("Some Body to Love AG"));
     		SUPPLIER.add(new Supplier("Wholesaler"));
 
+    		EventQueue.invokeLater(new Runnable() {
+    			public void run() {
+    				try {
+    					MonitoringGUI window = new MonitoringGUI();
+    					window.frame.setVisible(true);
+    				} catch (Exception e) {
+    					e.printStackTrace();
+    				}
+    			}
+    		});
     }
 
     // Singleton - because only one Monitor is allowed.
     public static Monitor getInstance() {
+    	if(monitor == null) {
+    		monitor = new Monitor();
+    		try {
+				warehouse = Database.getInstance();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		agv = AGV.getInstance();
+    		agv.startAGV();
+    		rob = RobotScheduler.getInstance();
+    	}
         return monitor;
+        
     }
     
     public int getNumberOfOngoingComponentsOrders() {

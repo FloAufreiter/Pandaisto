@@ -56,9 +56,6 @@ public class Database {
     private final PreparedStatement deleteShelvesStmt;
     private final PreparedStatement insertItemStmt;
     private final PreparedStatement deleteItemStmt;
-    //private final PreparedStatement addItemToDelivStmt;
-    //private final PreparedStatement checkShelfEmptyStmt;
-    //private final PreparedStatement insertShelfSpaceStmt;
     private final PreparedStatement freeShelfStmt;
     private final PreparedStatement itemByIDStmt;
     private final PreparedStatement idByItemTypeStmt;
@@ -95,9 +92,6 @@ public class Database {
     	deleteShelvesStmt = conn.prepareStatement("delete from shelves where warehouseID=?");
     	insertItemStmt = conn.prepareStatement("update shelves set type=? where shelfID=?");
     	deleteItemStmt = conn.prepareStatement("update shelves set type=null where shelfID=?");
-    	//addItemToDelivStmt = conn.prepareStatement("update shelfspaces set deliveryID=? where shelfspaceID=?");
-    	//insertShelfSpaceStmt = conn.prepareStatement("insert into shelfspaces (shelfSpaceID, shelfID) values(?,?)");
-    	//checkShelfEmptyStmt = conn.prepareStatement("select count(*) as cnt from shelfspaces where shelfID=? and type is not null");
     	freeShelfStmt = conn.prepareStatement("select shelfID from shelves where type is null");
     	itemByIDStmt = conn.prepareStatement("select type from shelves where shelfID=?");
     	idByItemTypeStmt = conn.prepareStatement("select shelfID from shelves where type=?");
@@ -235,12 +229,12 @@ public class Database {
 	    	insertItemStmt.setInt(2, shelfID);
 	    	insertItemStmt.executeUpdate();
 	    	shelvesToBeFilled.remove(shelfID);
-    		warehousePrint(type.toString() + " ADDED TO SHELF " + shelfID);
+    		//warehousePrint(type.toString() + " ADDED TO SHELF " + shelfID);
     	} catch(SQLException e) {
     		e.printStackTrace();
     		return false;
     	}
-    	fireEvent(EventType.ItemAdded, type);
+    	//fireEvent(EventType.ItemAdded, type);
     	return true;
     	}
     }
@@ -342,13 +336,6 @@ public class Database {
     			"shelfCapacity integer)";
     	String createShelfTable ="create table Shelves (shelfID integer primary key not Null," +
     			"warehouseID integer references warehouses(warehouseID) not Null, type varchar(32), level integer)"; //level can be 0 1 or 2
-//    	String createShelfSpaceTable = "create table shelfSpaces (shelfSpaceID integer primary key not null,"+
-//    			"shelfID integer references shelves(shelfID) not null, type varchar(32) default null, deliveryID integer references deliveries(deliveryID))";
-//    	String createDeliveryTable = "create table Deliveries (deliveryID integer primary key not null,"+
-   // 			"loadingDockID integer references loadingdocks(loadingdockid) not null, expectedDeliveryDate Date)";
-    //	String createLoadingDockTable = "create table LoadingDocks (loadingDockID integer primary key not null)";
-    //	String createDistancesTable = "create table LoadingDockDistances (loadingDockID integer references LoadingDocks(loadingDockID),"+
-    //	"shelfID integer references shelves(shelfID), distance integer)";
     	try {
     		PreparedStatement createWarehouseTableStmt = conn.prepareStatement(createWarehouseTable);
     		createWarehouseTableStmt.executeUpdate();
@@ -356,23 +343,35 @@ public class Database {
     		PreparedStatement createShelfTableStmt = conn.prepareStatement(createShelfTable);
     		createShelfTableStmt.executeUpdate();
     		
-//    		PreparedStatement createLoadingDockTableStmt = conn.prepareStatement(createLoadingDockTable);
-//    		createLoadingDockTableStmt.executeUpdate();
-//
-//    		PreparedStatement createDeliveryTableStmt = conn.prepareStatement(createDeliveryTable);
-//    		createDeliveryTableStmt.executeUpdate();
-//
-//    		PreparedStatement createShelfSpaceTableStmt = conn.prepareStatement(createShelfSpaceTable);
-//    		createShelfSpaceTableStmt.executeUpdate();
-//
-//    		PreparedStatement createDistancesStmt = conn.prepareStatement(createDistancesTable);
-//    		createDistancesStmt.executeUpdate();
     	} catch(SQLException e) {
     		e.printStackTrace();
     	}
     	
     	}
 
+    public void initTestDB() throws SQLException {
+    	Database db = this;
+    	db.insertWarehouse(0, 1000);
+		for(int i = 0; i < 60;) {
+			db.insertShelf(i++, 0, 0); //Floor shelves
+			db.insertShelf(i++, 0, 1); // middle shelves
+			db.insertShelf(i++, 0, 2); //top shelf
+		}
+		int n = 5;
+		for(int i = 0; i < n; i++) {
+			db.insertItem(i, ItemType.SCREW);
+			db.insertItem(i+n, ItemType.BLUE_PAINT);
+			db.insertItem(i+n*2, ItemType.CAR_BODY);
+			db.insertItem(i+n*3, ItemType.RED_PAINT);
+			db.insertItem(i+n*4, ItemType.REMOTE);
+			db.insertItem(i+n*5, ItemType.WHEEL);
+		}
+    }
+    
+    public void deleteTestDB() throws SQLException {
+    	this.deleteWarehouse(0);
+    }
+    
     private void fireEvent(EventType eType, ItemType itemType) {
     	DBEvent e = new DBEvent(eType, itemType);
     	for(DBListener l: listeners) l.notifyEvent(e);
