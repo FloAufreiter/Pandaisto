@@ -25,7 +25,6 @@ public class LubricantControl {
 			}
 			averagePressure += sensors.get(i).getLubricantLevel()/5.0;  
 		}
-		System.out.println(averagePressure);
 	}
 	
 	public float getCurrentLubricantLevel() {

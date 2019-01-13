@@ -3,7 +3,7 @@ package conveyor;
 import shared.ItemType;
 
 public class BeltControlSystem implements Runnable{
-	private final BeltSegment beltStart;
+	private final BeltSegment[] beltStart = new BeltSegment[2];
 	private final LubricantControl lubController;
 	private static BeltControlSystem bcs;
 	
@@ -18,8 +18,16 @@ public class BeltControlSystem implements Runnable{
 			id++;
 			curr = new BeltSegment(curr, id, maxConveyorSpeed);
 		}        
-		beltStart = curr;
-
+		beltStart[0] = curr;
+		
+		curr = new BeltSegment(null, id, maxConveyorSpeed);
+		for(int i = 1 ; i <= 16; i++) {
+			id++;
+			curr = new BeltSegment(curr, id, maxConveyorSpeed);
+		}        
+		beltStart[1] = curr;
+		
+		
 		ConveyorGUI.openGUI(beltStart, lubController);
 	}
 	public static BeltControlSystem getInstance(float minLubPressure, float maxConveyorSpeed) {
@@ -31,7 +39,8 @@ public class BeltControlSystem implements Runnable{
 	
 	
 	public void moveAllBeltsForward() {
-		moveAllForwardRec(beltStart);
+		moveAllForwardRec(beltStart[0]);
+		moveAllForwardRec(beltStart[1]);
 	}
 	
 	private void moveAllForwardRec(BeltSegment curr) {
@@ -46,13 +55,15 @@ public class BeltControlSystem implements Runnable{
 	}
 	
 	private BeltSegment getBeltSegment(int id) {
-
-		for(BeltSegment curr = beltStart;
+		
+		for(int i = 0 ; i < 2; i++) {
+			for(BeltSegment curr = beltStart[0];
 				curr != null;
 				curr = curr.getSuccessor()) {
 				if(curr.getBeltID() == id) {
 					return curr;
 				}
+			}
 		}
 		return null;
 	}
@@ -74,13 +85,15 @@ public class BeltControlSystem implements Runnable{
 	}
 	public void printConveyor() {
 		System.out.println("Start");
-		for(BeltSegment curr = beltStart;
-				curr != null;
-				curr = curr.getSuccessor()) {
-			if(curr.isEmpty()) {
-				System.out.println("0\t " + curr.getBeltID());
-			}else {
-				System.out.println(curr.getItemType().toString() + "\t " + curr.getBeltID());
+		for(int i= 0; i < 2; i++) {
+			for(BeltSegment curr = beltStart[i];
+					curr != null;
+					curr = curr.getSuccessor()) {
+				if(curr.isEmpty()) {
+					System.out.println("0\t " + curr.getBeltID());
+				}else {
+					System.out.println(curr.getItemType().toString() + "\t " + curr.getBeltID());
+				}
 			}
 		}
 		System.out.println("End");	
