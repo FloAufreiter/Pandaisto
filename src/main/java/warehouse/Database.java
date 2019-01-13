@@ -229,12 +229,12 @@ public class Database {
 	    	insertItemStmt.setInt(2, shelfID);
 	    	insertItemStmt.executeUpdate();
 	    	shelvesToBeFilled.remove(shelfID);
-    		//warehousePrint(type.toString() + " ADDED TO SHELF " + shelfID);
+    		warehousePrint(type.toString() + " ADDED TO SHELF " + shelfID);
     	} catch(SQLException e) {
     		e.printStackTrace();
     		return false;
     	}
-    	//fireEvent(EventType.ItemAdded, type);
+    	fireEvent(EventType.ItemAdded, type);
     	return true;
     	}
     }
