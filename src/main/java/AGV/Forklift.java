@@ -1,6 +1,6 @@
 package AGV;
 import java.util.List;
-
+import assembly_robot_arms.RobotScheduler;
 import shared.ItemType;
 import warehouse.AGVInterface;
 
@@ -142,6 +142,7 @@ class Forklift implements Runnable {
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
                 case PRODUCTION_LINE:
+                    RobotScheduler.get(location.getId()).removeElement();
             }
             Thread.sleep(600); //TODO: changed for faster testing!
         } catch (Exception e) {
@@ -166,6 +167,8 @@ class Forklift implements Runnable {
                     setForkHeight(FORKHEIGHT_2);
                     AGVInterface.confirmItemAdded(location.getId(), it);
                     break;
+                case PRODUCTION_LINE:
+                   RobotScheduler.get(location.getId()).addElement();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

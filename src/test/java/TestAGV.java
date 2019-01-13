@@ -1,4 +1,5 @@
 import AGV.AGV;
+import assembly_robot_arms.RobotScheduler;
 import org.junit.Test;
 import shared.ItemType;
 import AGV.Location;
@@ -46,9 +47,9 @@ public class TestAGV {
         assertEquals(1, Database.getInstance().itemsInStock(ItemType.CAR_BODY));
         Database.getInstance().deleteItem(50000);
         assertEquals(0, Database.getInstance().itemsInStock(ItemType.CAR_BODY));
-        Database.getInstance().deleteWarehouse(4);
+
     }
-    
+
     @Test
     public void checkItemStock() throws SQLException {
     	Database db = Database.getInstance();
@@ -62,6 +63,32 @@ public class TestAGV {
     	assertEquals(0, db.itemsInStock(ItemType.RED_PAINT));
     }
     
+	@Test
+    public void testCommunicationAGVWithRobotArms() throws SQLException, InterruptedException {
+        AGV agv = AGV.getInstance();
+        RobotScheduler.getInstance().startRobotArms();
+        Database.getInstance().insertItem(0, ItemType.CAR_BODY);
+        Database.getInstance().insertItem(1, ItemType.RED_PAINT);
+        for(int i = 2; i < 20; i ++) Database.getInstance().insertItem(i, ItemType.RED_PAINT);
+
+        for(int i = 22; i < 40; i ++) Database.getInstance().insertItem(i, ItemType.CAR_BODY);
+        
+        Location l1 = Area.getLocation(Location.LocationType.FLOORSHELF, 0);
+        Location r0 = Area.getLocation(Location.LocationType.PRODUCTION_LINE, 0);
+        Location l2 = Area.getLocation(Location.LocationType.TOPSHELF1, 1);
+        Location r4 = Area.getLocation(Location.LocationType.PRODUCTION_LINE, 4);
+        agv.startAGV();
+        agv.getAGVTaskScheduler().createTask(l1, r0, ItemType.CAR_BODY);
+        agv.getAGVTaskScheduler().createTask(l2, r4, ItemType.RED_PAINT);
+        
+        RobotScheduler.getInstance().startRobotArms();
+        
+        Thread.sleep(30000);
+        
+        //check if Database is consistent
+        assertEquals(18, Database.getInstance().itemsInStock(ItemType.CAR_BODY));
+        assertEquals(18, Database.getInstance().itemsInStock(ItemType.RED_PAINT));
+	}
     public void checkCorrectItem() throws SQLException {
     	Database db = Database.getInstance();
     }
