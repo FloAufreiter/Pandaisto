@@ -12,12 +12,13 @@ public class Arm implements Runnable {
     private int id;
     private BeltControlSystem bcs;
 
+    protected List<RobotStorage> type;
+    boolean stop = false;
+
+    
     public List<RobotStorage> getRobotStorages() {
         return type;
     }
-
-    protected List<RobotStorage> type;
-    boolean stop = false;
 
     public void stopArm() {
         stop = true;
@@ -39,7 +40,7 @@ public class Arm implements Runnable {
             switch (type.get(0).getType()) {
                 case CAR_BODY:
                     //TODO Communication with Conveyorbelt
-                    Thread.sleep(2000);
+                	Thread.sleep(2000);
                     if (type.get(0).getNrOfElements() > 0) {
                         type.get(0).removeElement();
                     }
@@ -47,24 +48,39 @@ public class Arm implements Runnable {
                     bcs.addItemAt(16, ItemType.CAR_BODY);
                     break;
                 case WHEEL:
-                    Thread.sleep(2000);
-                    if (type.get(0).getNrOfElements() > 0) {
-                        type.get(0).removeElement();
-                    }
-                    if (type.get(1).getNrOfElements() > 0) {
-                        type.get(1).removeElement();
-                    }
-                    System.out.println("Add Wheels to Car");
+                	if(!bcs.isEmpty(14) && bcs.getItemTypeAt(14) == ItemType.CAR_BODY) {
+                		bcs.removeItemAt(14);
+                		bcs.lockBeltAt(14);
+                	
+	                    Thread.sleep(2000);
+	                    if (type.get(0).getNrOfElements() > 0) {
+	                        type.get(0).removeElement();
+	                    }
+	                    if (type.get(1).getNrOfElements() > 0) {
+	                        type.get(1).removeElement();
+	                    }
+	                    System.out.println("Add Wheels to Car");
+	                    bcs.addItemAt(14, ItemType.CAR_BODY_WHEELS);
+	                }
+	                Thread.sleep(250);
+	                
+                	
                     break;
                 case RED_PAINT:
-                    Thread.sleep(2000);
-                    if (type.get(0).getNrOfElements() > 0) {
-                        type.get(0).removeElement();
-                    }
-                    System.out.println("Paint Car Red");
+                	if(!bcs.isEmpty(12) && bcs.getItemTypeAt(12) == ItemType.CAR_BODY_WHEELS) {
+                		bcs.lockBeltAt(12);
+                	
+	                	Thread.sleep(2000);
+	                    if (type.get(0).getNrOfElements() > 0) {
+	                        type.get(0).removeElement();
+	                    }
+	                    bcs.removeItemAt(12);
+                		bcs.addItemAt(12, ItemType.FINISHED_RED_CAR);
+	                }
                     break;
                 case BLUE_PAINT:
-                    Thread.sleep(2000);
+                    
+                	Thread.sleep(2000);
                     if (type.get(0).getNrOfElements() > 0) {
                         type.get(0).removeElement();
                     }
@@ -89,11 +105,16 @@ public class Arm implements Runnable {
                     System.out.println("Finished Blue Car");
                     break;
                 case FINISHED_RED_CAR:
-                    //TODO if finished car on belt
-                    //type.get(0).addElement();
-                    Thread.sleep(2000);
-                    //TODO GUI print "ROBOTARM NR: (ID) Action...."
-                    System.out.println("Finished Red Car");
+                	if(!bcs.isEmpty(0) && bcs.getItemTypeAt(0) == ItemType.FINISHED_RED_CAR) {
+                		bcs.removeItemAt(0);
+                		//TODO if finished car on belt
+                		type.get(0).addElement();
+                    	Thread.sleep(2000);
+                    	//TODO GUI print "ROBOTARM NR: (ID) Action...."
+                    	System.out.println("Finished Red Car");
+                    }else {
+                    	Thread.sleep(2000);
+                    }
                     break;
                 default:
                     return;

@@ -4,13 +4,13 @@ import shared.ItemType;
 
 public class BeltControlSystem implements Runnable{
 	private final BeltSegment beltStart;
-	private final LubricantControll lubController;
+	private final LubricantControl lubController;
 	private static BeltControlSystem bcs;
 	
 	private static boolean STOP = true;
 	
 	private BeltControlSystem(float minLubPressure, float maxConveyorSpeed){
-		lubController = new LubricantControll(minLubPressure);
+		lubController = new LubricantControl(minLubPressure);
 		//init conveyor belt segments
 		int id = 0;
 		BeltSegment curr = new BeltSegment(null, id, maxConveyorSpeed);
@@ -19,6 +19,8 @@ public class BeltControlSystem implements Runnable{
 			curr = new BeltSegment(curr, id, maxConveyorSpeed);
 		}        
 		beltStart = curr;
+
+		ConveyorGUI.openGUI(beltStart, lubController);
 	}
 	public static BeltControlSystem getInstance(float minLubPressure, float maxConveyorSpeed) {
 		if(bcs == null) {
@@ -86,17 +88,22 @@ public class BeltControlSystem implements Runnable{
 	
 	@Override
 	public void run() {
+		int count = 0;
 		while(!STOP) {
+			count++;
 			try {
-				Thread.sleep(3000); //TODO make this delay something that makes more sence
+				Thread.sleep(250);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			printConveyor();
-			synchronized(this) {
-				moveAllBeltsForward();
+			//printConveyor();
+			if(count % 10 == 0) {
+				synchronized(this) {
+					moveAllBeltsForward();
+				}
 			}
 			lubController.updateLubLevels();
+			ConveyorGUI.updateGUI();
 		}
 	}
 	
@@ -109,7 +116,9 @@ public class BeltControlSystem implements Runnable{
 	}
 
 	public void lockBeltAt(int beltId){
-		getBeltSegment(beltId);
+		getBeltSegment(beltId).lockSegment();
 	}
-
+	public ItemType getItemTypeAt(int beltId) {
+		return getBeltSegment(beltId).getItemType();
+	}
 }

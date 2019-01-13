@@ -21,13 +21,12 @@ public class RobotScheduler {
 	public static RobotScheduler getInstance() {
 		if(INSTANCE == null) {
 			BeltControlSystem bcs = BeltControlSystem.getInstance(10, 100);
-			bcs.start();
+			BeltControlSystem.start();
 			new Thread(bcs).start();
 			INSTANCE = new RobotScheduler(bcs);
 
 		}
 			return INSTANCE;
-
 	}
 
 	public static Arm get(int id) {
@@ -64,8 +63,8 @@ public class RobotScheduler {
 		arms[1].addStorageType(new RobotStorage(ItemType.CAR_BODY, 10, 5));
 
 		arms[2] = new Arm(belt);
-		arms[2].addStorageType(new RobotStorage(ItemType.SCREW, 40, 20));
 		arms[2].addStorageType(new RobotStorage(ItemType.WHEEL, 40, 20));
+		arms[2].addStorageType(new RobotStorage(ItemType.SCREW, 40, 20));
 
 		arms[3] = new Arm(belt);
 		arms[3].addStorageType(new RobotStorage(ItemType.SCREW, 40, 20));
