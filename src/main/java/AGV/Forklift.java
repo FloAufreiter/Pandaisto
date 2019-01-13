@@ -1,4 +1,6 @@
 package AGV;
+import java.util.List;
+
 import shared.ItemType;
 import warehouse.AGVInterface;
 
@@ -18,7 +20,7 @@ class Forklift implements Runnable {
 
     private Status status = Status.AVAILABLE;
 
-    private static final int maximumCarriageWeight = 1000;
+    private static final int maximumCarriageWeight = 100;
 
     private int currentCarriageWeight = 0;
 
@@ -52,7 +54,7 @@ class Forklift implements Runnable {
 
     @Override
     public void run() {
-        status = Status.IN_USE;
+//        status = Status.IN_USE; //is set in scheduler loop
         AGV.updateGui(this);
         executeRoute(loadingRoute);
         executeRoute(unloadingRoute);
@@ -64,19 +66,22 @@ class Forklift implements Runnable {
         while (!route.getStops().isEmpty()) {
             Location nearest = getNextNearestLocation(route);
             driveToLocation(nearest);
-            Task t = route.getStops().get(nearest);
-            switch (t.getCurrentState()) {
-                case unprocessed:
-                    loadCommodity(route.getStops().get(nearest).getItemType(), nearest);
-                    t.switchState();
-                    break;
-                case loaded:
-                    unloadCommodity(route.getStops().get(nearest).getItemType(), nearest);
-                    t.switchState();
-                    System.out.println("done " + t.getId());
-                    break;
-                case finished:
-                    break;
+            List<Task> tasks = route.getStops().get(nearest);
+            for(Task t: tasks) {
+	            switch (t.getCurrentState()) {
+	                case unprocessed:
+	                    loadCommodity(t.getItemType(), nearest);
+	                    t.switchState();
+	                    System.out.println("done loading" +t.getId());
+	                    break;
+	                case loaded:
+	                    unloadCommodity(t.getItemType(), nearest);
+	                    t.switchState();
+	                    System.out.println("done unloading" + t.getId());
+	                    break;
+	                case finished:
+	                    break;
+	            }
             }
             route.getStops().remove(nearest);
             currentLocation = nearest;
@@ -123,19 +128,22 @@ class Forklift implements Runnable {
         try {
             switch (location.getType()) {
                 case FLOORSHELF:
+                	System.out.println(Thread.currentThread().getId() + " loading floorshelf");
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
                 case TOPSHELF1:
+                	System.out.println(Thread.currentThread().getId() + " loading topshelf1");
                     setForkHeight(FORKHEIGHT_1);
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
                 case TOPSHELF2:
+                	System.out.println(Thread.currentThread().getId() + " loading topshelf2");
                     setForkHeight(FORKHEIGHT_2);
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
                 case PRODUCTION_LINE:
             }
-            Thread.sleep(6000);
+            Thread.sleep(600); //TODO: changed for faster testing!
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -144,7 +152,8 @@ class Forklift implements Runnable {
     private void unloadCommodity(ItemType it, Location location) {
         //TODO trigger functions of other subsystems
         try {
-            Thread.sleep(4000);
+        	System.out.println(Thread.currentThread().getId() + " unloading");
+            Thread.sleep(400); //TODO cahnged for faster testing
             switch(location.getType()) {
                 case FLOORSHELF:
                     AGVInterface.confirmItemAdded(location.getId(), it);
@@ -176,5 +185,8 @@ class Forklift implements Runnable {
             e.printStackTrace();
         }
     }
-
+    
+    public void setStatus(Status s) {
+    	this.status = s;
+    }
 }

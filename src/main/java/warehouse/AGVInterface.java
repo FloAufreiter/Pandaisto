@@ -19,7 +19,9 @@ public class AGVInterface extends MessagingInterface {
 	 */
 	public static boolean confirmItemRemoval(int shelfPlaceID) {
 		try {
+			System.out.println("REMOVING");
 			Database.getInstance().deleteItem(shelfPlaceID);
+			System.out.println("removed");
 			return true;
 		} catch (SQLException e) {
 			// TODO properly handle exception

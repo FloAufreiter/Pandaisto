@@ -9,7 +9,6 @@ import java.util.concurrent.*;
 public class TaskScheduler implements Runnable {
 
     ExecutorService executorService = Executors.newFixedThreadPool(10);
-    ArrayList<Thread> pool = new ArrayList<>(10);
     
     public void stopScheduler() {
         STOP_AGV = true;
@@ -50,10 +49,11 @@ public class TaskScheduler implements Runnable {
                     }
                 }
                 nearest_free.addTask(t);
+                System.out.println("ADDED TASK " + t.getId());
+                nearest_free.setStatus(Forklift.Status.IN_USE);
                 if (nearest_free.isFullyLoaded()) {
-                    new Thread(nearest_free).start();
                 	
-                    //executorService.execute(nearest_free);
+                    executorService.execute(nearest_free);
                     freeLifters.remove(nearest_free);
                 }
             } catch (InterruptedException e) {
@@ -63,7 +63,7 @@ public class TaskScheduler implements Runnable {
         if (!freeLifters.isEmpty()) {
             for (Forklift f : freeLifters) {
                 if(!f.loadingRouteEmpty()) {
-                    new Thread(f).start();
+                    executorService.execute(f);
                 }
             }
         }
@@ -80,6 +80,7 @@ public class TaskScheduler implements Runnable {
     }
 
     public synchronized boolean createTask(Location location1, Location location2, ItemType itemType) {
+    	System.out.println("TASK CREATED");
         if (tasks.size() == 100) {
             return false;
         } else {

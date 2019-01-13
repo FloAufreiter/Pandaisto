@@ -2,6 +2,7 @@ package warehouse;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import AGV.Location;
 import shared.ItemType;
@@ -63,6 +64,10 @@ public class Database {
     private final PreparedStatement idByItemTypeStmt;
     private final PreparedStatement itemStockStmt;
     private final PreparedStatement getLevelStmt;
+   
+    //keep track of what id'S have been already been given out
+    private final HashSet<Integer> itemsToBeRemoved = new HashSet<>();
+    private final HashSet<Integer> shelvesToBeFilled = new HashSet<>();
     
     //list of listeners that act on changes to database
     private final ArrayList<DBListener> listeners;
@@ -150,7 +155,6 @@ public class Database {
 				insertShelfStmt.setInt(2, warehouseID);
 				insertShelfStmt.setInt(3, level);
 				insertShelfStmt.executeUpdate();
-				System.out.println(shelfID);
     		} catch(SQLException e) {
 				return ! deleteShelf(shelfID);
     		}
@@ -230,6 +234,8 @@ public class Database {
     		insertItemStmt.setString(1, type.toString());
 	    	insertItemStmt.setInt(2, shelfID);
 	    	insertItemStmt.executeUpdate();
+	    	shelvesToBeFilled.remove(shelfID);
+    		warehousePrint(type.toString() + " ADDED TO SHELF " + shelfID);
     	} catch(SQLException e) {
     		e.printStackTrace();
     		return false;
@@ -262,9 +268,13 @@ public class Database {
 	    		}
 	    		deleteItemStmt.setInt(1, shelfID);
 	    		deleteItemStmt.executeUpdate();
+	    		warehousePrint(itemType + " DELETED FROM SHELF " + shelfID);
 	    	} catch(SQLException e) {
+	    		e.printStackTrace();
 	    		return false;
 	    	}
+	    	if(itemsToBeRemoved.contains(shelfID)) itemsToBeRemoved.remove(shelfID);
+	    	
 	    	fireEvent(EventType.ItemRemoved, stringToItem(itemType));
 	    	return true;
 		}
@@ -300,10 +310,14 @@ public class Database {
     		idByItemTypeStmt.setString(1, type);
 			ResultSet res = idByItemTypeStmt.executeQuery();
 			int ret = -1;
-			if(res.next()) { //this is going to be optimized later on to return item with least distance
-				ret = res.getInt("shelfplaceid");
+			while(res.next()) {
+				ret = res.getInt("shelfid");
+				if(! itemsToBeRemoved.contains(ret)) {
+					itemsToBeRemoved.add(ret); //items are always queried before removal
+					return ret; //only items that haven't been queried get removed
+				}
 			}
-			return ret;
+			return -1;
 		}
     }
     
@@ -367,8 +381,12 @@ public class Database {
     int getFreeShelf() throws SQLException {
 		synchronized (freeShelfStmt) {
 			ResultSet res = freeShelfStmt.executeQuery();
-			if(res.next()) {
-				return res.getInt("shelfid");
+			while(res.next()) {
+				int ret = res.getInt("shelfid"); 
+				if(! shelvesToBeFilled.contains(ret)) {
+					shelvesToBeFilled.add(ret);
+					return ret;
+				}
 			}
 		}
 		return -1;
@@ -417,6 +435,9 @@ public class Database {
     	return null;
     }
     	
+    static void warehousePrint(String msg) {
+    	System.out.println("\n------WAREHOUSE MESSAGE BEGIN------\n" + msg + "\n------WAREHOUSE MESSAGE END------\n");
+    }
 //    public static void main(String[] Args) {
 //    	Database db = null;
 //    	try {

@@ -1,6 +1,7 @@
 package Monitoring;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import AGV.AGV;
 import AGV.Area;
@@ -43,8 +44,6 @@ public class Monitor implements Runnable {
     		
     		
     		}
-    	
-    	System.out.println("duh");
     	
         ONGOING_ORDERS.add(new ComponentOrder(amount, itemType, supplier));
         orderComponents();
@@ -122,32 +121,35 @@ public class Monitor implements Runnable {
         @Override
         public void run() {
             try {
-                Thread.sleep(10000);
-                System.out.println("runs");
+                Thread.sleep(1000);
                 TaskScheduler ts = AGV.getInstance().getAGVTaskScheduler();
                 //TODO which Order IF
                 boolean task_created = false;
                 ShelfType st = null;
-                Location l1 = Area.getLocation(Location.LocationType.LOADING_DOCK, 0); //TODO random which loading 0-3
+                Random rand = new Random();
+                Location l1 = Area.getLocation(Location.LocationType.LOADING_DOCK, rand.nextInt(3)); //TODO random which loading 0-3
                 Location l2;
-                while(st == null) {
-                    //ask Warehouse where to bring
-                    st = MonitoringInterface.getFreeItemLocation(order);
-                    if(st == null) Thread.sleep(10000);
-                    else {
-                    	System.out.println(st);
-                    	l2 = Area.getLocation(st.getType(), st.getId());
-                    
-	                    while (!task_created) {
-	                        for(int i = 0; i < order.getAmount(); i++) {
-	                            task_created = ts.createTask(l1, l2, order.getItemType());
-	                        }
-	                        if (task_created) {
-	                            ONGOING_ORDERS.remove(order);
-	                        }
+                for(int i = 0; i < order.getAmount(); i++) {
+	                while(st == null) {
+	                    //ask Warehouse where to bring
+	                    st = MonitoringInterface.getFreeItemLocation(order);
+	                    if(st == null) Thread.sleep(1000);
+	                    else {
+	                    	l2 = Area.getLocation(st.getType(), st.getId());
+	                    
+		                    while (!task_created) {
+		                            task_created = ts.createTask(l1, l2, order.getItemType());
+		                        	
+		                    }
+		                    
 	                    }
+	                }
+	                if(task_created) {
+                    	st = null;
+                    	task_created = false;
                     }
                 }
+                ONGOING_ORDERS.remove(order);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
