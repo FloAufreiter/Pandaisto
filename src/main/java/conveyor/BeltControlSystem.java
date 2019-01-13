@@ -88,15 +88,19 @@ public class BeltControlSystem implements Runnable{
 	
 	@Override
 	public void run() {
+		int count = 0;
 		while(!STOP) {
+			count++;
 			try {
-				Thread.sleep(3000); //TODO make this delay something that makes more sence
+				Thread.sleep(250);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			printConveyor();
-			synchronized(this) {
-				moveAllBeltsForward();
+			//printConveyor();
+			if(count % 10 == 0) {
+				synchronized(this) {
+					moveAllBeltsForward();
+				}
 			}
 			lubController.updateLubLevels();
 			ConveyorGUI.updateGUI();
@@ -114,5 +118,7 @@ public class BeltControlSystem implements Runnable{
 	public void lockBeltAt(int beltId){
 		getBeltSegment(beltId).lockSegment();
 	}
-
+	public ItemType getItemTypeAt(int beltId) {
+		return getBeltSegment(beltId).getItemType();
+	}
 }

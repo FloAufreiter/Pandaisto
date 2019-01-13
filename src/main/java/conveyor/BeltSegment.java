@@ -91,16 +91,36 @@ public class BeltSegment {
 		if(!this.isEmpty()) {
 			//draw what is on the belt
 			switch(item) {
-			case WHEEL:
+			case CAR_BODY_WHEELS:
 					g.setColor(Color.BLACK);
-					g.fillOval(x+2, y+2, 20, 20);
-					g.setColor(Color.WHITE);
-					g.fillOval(x+7, y+7, 10, 10);
-				break;
+					g.fillOval(x+13, y+6, 3, 3);
+					g.fillOval(x+18, y+6, 3, 3);
+					g.fillOval(x+13, y+12, 3, 3);
+					g.fillOval(x+18, y+12, 3, 3);
 			case CAR_BODY:
 					g.setColor(Color.BLACK);
-					g.fillRect(x+2, y+2, 10, 5);
+					g.fillRect(x+7, y+12, 10, 5);
 				break;
+			case FINISHED_RED_CAR:
+				g.setColor(Color.BLACK);
+				g.fillOval(x+13, y+6, 3, 3);
+				g.fillOval(x+18, y+6, 3, 3);
+				g.fillOval(x+13, y+12, 3, 3);
+				g.fillOval(x+18, y+12, 3, 3);
+				g.setColor(Color.RED);
+				g.fillRect(x+7, y+12, 10, 5);
+		
+				break;
+			case FINISHED_BLUE_CAR:
+				g.setColor(Color.BLACK);
+				g.fillOval(x+13, y+6, 3, 3);
+				g.fillOval(x+18, y+6, 3, 3);
+				g.fillOval(x+13, y+12, 3, 3);
+				g.fillOval(x+18, y+12, 3, 3);
+				g.setColor(Color.BLUE);
+				g.fillRect(x+7, y+12, 10, 5);
+				break;
+		
 			default:
 				break;
 		

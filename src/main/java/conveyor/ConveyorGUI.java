@@ -36,8 +36,8 @@ public class ConveyorGUI {
 				return new Dimension(300,250);
 			}
 		};
-		JPanel beltPanel = new JPanel();
 		
+		JPanel beltPanel = new JPanel();
 		
 		beltPanel.add(conveyorcomp);
 		beltPanel.add(lubcomp);
