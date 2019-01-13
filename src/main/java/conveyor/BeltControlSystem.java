@@ -4,13 +4,13 @@ import shared.ItemType;
 
 public class BeltControlSystem implements Runnable{
 	private final BeltSegment beltStart;
-	private final LubricantControll lubController;
+	private final LubricantControl lubController;
 	private static BeltControlSystem bcs;
 	
 	private static boolean STOP = true;
 	
 	private BeltControlSystem(float minLubPressure, float maxConveyorSpeed){
-		lubController = new LubricantControll(minLubPressure);
+		lubController = new LubricantControl(minLubPressure);
 		//init conveyor belt segments
 		int id = 0;
 		BeltSegment curr = new BeltSegment(null, id, maxConveyorSpeed);
@@ -19,6 +19,8 @@ public class BeltControlSystem implements Runnable{
 			curr = new BeltSegment(curr, id, maxConveyorSpeed);
 		}        
 		beltStart = curr;
+
+		ConveyorGUI.openGUI(beltStart, lubController);
 	}
 	public static BeltControlSystem getInstance(float minLubPressure, float maxConveyorSpeed) {
 		if(bcs == null) {
@@ -97,6 +99,7 @@ public class BeltControlSystem implements Runnable{
 				moveAllBeltsForward();
 			}
 			lubController.updateLubLevels();
+			ConveyorGUI.updateGUI();
 		}
 	}
 	
@@ -109,7 +112,7 @@ public class BeltControlSystem implements Runnable{
 	}
 
 	public void lockBeltAt(int beltId){
-		getBeltSegment(beltId);
+		getBeltSegment(beltId).lockSegment();
 	}
 
 }

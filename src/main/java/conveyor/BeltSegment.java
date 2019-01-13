@@ -1,6 +1,7 @@
 package conveyor;
 
 import shared.ItemType;
+import java.awt.*;
 
 public class BeltSegment {
 
@@ -74,5 +75,39 @@ public class BeltSegment {
 	
 	public int getBeltID() {
 		return this.beltID;
+	}
+	
+	public void draw(Graphics g, int x, int y) {
+		if(successor != null) {
+			successor.draw(g,x+40,y);
+		}
+		if(!locked) {
+			g.setColor(Color.WHITE);
+		}else {
+			g.setColor(Color.GRAY);
+		}
+		g.fillRect(x,y,25,25);
+		
+		if(!this.isEmpty()) {
+			//draw what is on the belt
+			switch(item) {
+			case WHEEL:
+					g.setColor(Color.BLACK);
+					g.fillOval(x+2, y+2, 20, 20);
+					g.setColor(Color.WHITE);
+					g.fillOval(x+7, y+7, 10, 10);
+				break;
+			case CAR_BODY:
+					g.setColor(Color.BLACK);
+					g.fillRect(x+2, y+2, 10, 5);
+				break;
+			default:
+				break;
+		
+			}
+		}
+		//draw the belt
+		g.setColor(Color.BLACK);
+		g.drawRect(x, y, 25, 25);
 	}
 }
