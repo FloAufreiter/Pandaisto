@@ -24,7 +24,7 @@ public class RobotScheduler {
 			BeltControlSystem.start();
 			new Thread(bcs).start();
 			INSTANCE = new RobotScheduler(bcs);
-
+			
 		}
 			return INSTANCE;
 	}
@@ -55,13 +55,14 @@ public class RobotScheduler {
 		}
 	}
 	
+	
 	private void initArms() {
-		arms[0] = new Arm(belt);
+		arms[0] = new Arm(belt,16);
 		arms[0].addStorageType(new RobotStorage(ItemType.CAR_BODY, 10, 5));
 
-		arms[1] = new Arm(belt);
+		arms[1] = new Arm(belt,20);
 		arms[1].addStorageType(new RobotStorage(ItemType.CAR_BODY, 10, 5));
-
+		/*
 		arms[2] = new Arm(belt);
 		arms[2].addStorageType(new RobotStorage(ItemType.WHEEL, 40, 20));
 		arms[2].addStorageType(new RobotStorage(ItemType.SCREW, 40, 20));
@@ -93,6 +94,6 @@ public class RobotScheduler {
 		arms[12] = new Arm(belt);
 		arms[13] = new Arm(belt);
 		arms[14] = new Arm(belt);
-		arms[15] = new Arm(belt);
+		arms[15] = new Arm(belt);*/
 	}
 }
