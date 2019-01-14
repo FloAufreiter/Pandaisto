@@ -19,7 +19,6 @@ public class AGVInterface extends MessagingInterface {
 	 */
 	public static boolean confirmItemRemoval(int shelfPlaceID) {
 		try {
-			if(shelfPlaceID < 0) System.out.println("SHELF DOESNT EXIST MAAAAN");
 			Database.getInstance().deleteItem(shelfPlaceID);
 			return true;
 		} catch (SQLException e) {
