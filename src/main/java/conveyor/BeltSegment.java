@@ -93,34 +93,32 @@ public class BeltSegment {
 			switch(item) {
 			case CAR_BODY_WHEELS:
 					g.setColor(Color.BLACK);
-					g.fillOval(x+13, y+6, 3, 3);
-					g.fillOval(x+18, y+6, 3, 3);
-					g.fillOval(x+13, y+12, 3, 3);
-					g.fillOval(x+18, y+12, 3, 3);
+					g.fillOval(x+13, y+9, 3, 3);
+					g.fillOval(x+6, y+9, 3, 3);
+					g.fillOval(x+13, y+16, 3, 3);
+					g.fillOval(x+6, y+16, 3, 3);
 			case CAR_BODY:
 					g.setColor(Color.BLACK);
 					g.fillRect(x+7, y+12, 10, 5);
 				break;
 			case FINISHED_RED_CAR:
 				g.setColor(Color.BLACK);
-				g.fillOval(x+13, y+6, 3, 3);
-				g.fillOval(x+18, y+6, 3, 3);
-				g.fillOval(x+13, y+12, 3, 3);
-				g.fillOval(x+18, y+12, 3, 3);
+				g.fillOval(x+13, y+9, 3, 3);
+				g.fillOval(x+6, y+9, 3, 3);
+				g.fillOval(x+13, y+16, 3, 3);
+				g.fillOval(x+6, y+16, 3, 3);
 				g.setColor(Color.RED);
 				g.fillRect(x+7, y+12, 10, 5);
-		
 				break;
 			case FINISHED_BLUE_CAR:
 				g.setColor(Color.BLACK);
-				g.fillOval(x+13, y+6, 3, 3);
-				g.fillOval(x+18, y+6, 3, 3);
-				g.fillOval(x+13, y+12, 3, 3);
-				g.fillOval(x+18, y+12, 3, 3);
+				g.fillOval(x+13, y+9, 3, 3);
+				g.fillOval(x+6, y+9, 3, 3);
+				g.fillOval(x+13, y+16, 3, 3);
+				g.fillOval(x+6, y+16, 3, 3);
 				g.setColor(Color.BLUE);
 				g.fillRect(x+7, y+12, 10, 5);
 				break;
-		
 			default:
 				break;
 		

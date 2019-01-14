@@ -57,7 +57,7 @@ public class BeltControlSystem implements Runnable{
 	private BeltSegment getBeltSegment(int id) {
 		
 		for(int i = 0 ; i < 2; i++) {
-			for(BeltSegment curr = beltStart[0];
+			for(BeltSegment curr = beltStart[i];
 				curr != null;
 				curr = curr.getSuccessor()) {
 				if(curr.getBeltID() == id) {
