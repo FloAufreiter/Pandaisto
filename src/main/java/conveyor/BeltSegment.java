@@ -119,6 +119,28 @@ public class BeltSegment {
 				g.setColor(Color.BLUE);
 				g.fillRect(x+7, y+12, 10, 5);
 				break;
+			case FINISHED_BLUE_CAR_REMOTE:
+				g.setColor(Color.BLACK);
+				g.fillOval(x+13, y+9, 3, 3);
+				g.fillOval(x+6, y+9, 3, 3);
+				g.fillOval(x+13, y+16, 3, 3);
+				g.fillOval(x+6, y+16, 3, 3);
+				g.setColor(Color.BLUE);
+				g.fillRect(x+7, y+12, 10, 5);
+				g.setColor(Color.BLACK);
+				g.drawLine(x+4, y+6, x+6, y+13);
+				break;
+			case FINISHED_RED_CAR_REMOTE:
+				g.setColor(Color.BLACK);
+				g.fillOval(x+13, y+9, 3, 3);
+				g.fillOval(x+6, y+9, 3, 3);
+				g.fillOval(x+13, y+16, 3, 3);
+				g.fillOval(x+6, y+16, 3, 3);
+				g.setColor(Color.RED);
+				g.fillRect(x+7, y+12, 10, 5);
+				g.setColor(Color.BLACK);
+				g.drawLine(x+4, y+6, x+6, y+13);
+				break;
 			default:
 				g.setColor(Color.BLACK);
 				g.fillOval(x, y, 25, 25);
