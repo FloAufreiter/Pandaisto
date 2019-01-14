@@ -39,7 +39,6 @@ public class TestConveyor {
 		
 		for(int i = 0; i < 15; i++) {
 			bcs.moveAllBeltsForward();
-			bcs.printConveyor();
 		}
 
 		assert(bcs.addItemAt(2, ItemType.BLUE_PAINT) == false);
@@ -54,8 +53,9 @@ public class TestConveyor {
 		
 		for(int i = 0; i < 5; i++) {
 			bcs.moveAllBeltsForward();
-			bcs.printConveyor();
 		}
+		
+		bcs.removeItemAt(13);
 		assert(false);
 		
 	}
