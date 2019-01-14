@@ -44,7 +44,7 @@ class Forklift implements Runnable {
 
     enum Status {
         AVAILABLE,
-        OUT_OF_ORDER,
+        //OUT_OF_ORDER, //maintenance currently not considered
         IN_USE
     }
 
@@ -54,7 +54,6 @@ class Forklift implements Runnable {
 
     @Override
     public void run() {
-//        status = Status.IN_USE; //is set in scheduler loop
         AGV.updateGui(this);
         executeRoute(loadingRoute);
         executeRoute(unloadingRoute);
@@ -124,19 +123,18 @@ class Forklift implements Runnable {
     }
 
     private void loadCommodity(ItemType it, Location location) {
-        //TODO trigger functions of other subsystems
         try {
             switch (location.getType()) {
-                case FLOORSHELF:
+                case FLOOR_SHELF:
                 	//System.out.println(Thread.currentThread().getId() + " loading floorshelf");
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
-                case TOPSHELF1:
+                case TOP_SHELF1:
                 	//System.out.println(Thread.currentThread().getId() + " loading topshelf1");
                     setForkHeight(FORKHEIGHT_1);
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
-                case TOPSHELF2:
+                case TOP_SHELF2:
                 	//System.out.println(Thread.currentThread().getId() + " loading topshelf2");
                     setForkHeight(FORKHEIGHT_2);
                     AGVInterface.confirmItemRemoval(location.getId());
@@ -151,19 +149,18 @@ class Forklift implements Runnable {
     }
 
     private void unloadCommodity(ItemType it, Location location) {
-        //TODO trigger functions of other subsystems
         try {
         	System.out.println(Thread.currentThread().getId() + " unloading");
             Thread.sleep(400); //TODO cahnged for faster testing
             switch(location.getType()) {
-                case FLOORSHELF:
+                case FLOOR_SHELF:
                     AGVInterface.confirmItemAdded(location.getId(), it);
                     break;
-                case TOPSHELF1:
+                case TOP_SHELF1:
                     setForkHeight(FORKHEIGHT_1);
                     AGVInterface.confirmItemAdded(location.getId(), it);
                     break;
-                case TOPSHELF2:
+                case TOP_SHELF2:
                     setForkHeight(FORKHEIGHT_2);
                     AGVInterface.confirmItemAdded(location.getId(), it);
                     break;
@@ -178,15 +175,6 @@ class Forklift implements Runnable {
     void addTask(Task t) {
         loadingRoute.addLocation(t.getLocationA(), t);
         unloadingRoute.addLocation(t.getLocationB(), t);
-    }
-
-    private void maintain(long duration) {
-        status = Status.OUT_OF_ORDER;
-        try {
-            Thread.sleep(duration);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
     
     public void setStatus(Status s) {

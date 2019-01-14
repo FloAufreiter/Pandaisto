@@ -49,7 +49,6 @@ public class TaskScheduler implements Runnable {
                     }
                 }
                 nearest_free.addTask(t);
-                //System.out.println("ADDED TASK " + t.getId());
                 nearest_free.setStatus(Forklift.Status.IN_USE);
                 if (nearest_free.isFullyLoaded()) {
                 	

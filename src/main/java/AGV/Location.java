@@ -3,9 +3,9 @@ package AGV;
 public class Location {
 
     public enum LocationType {
-        FLOORSHELF,
-        TOPSHELF1,
-        TOPSHELF2,
+        FLOOR_SHELF,
+        TOP_SHELF1,
+        TOP_SHELF2,
         PRODUCTION_LINE,
         LOADING_DOCK
     }

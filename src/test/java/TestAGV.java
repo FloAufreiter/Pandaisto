@@ -4,13 +4,11 @@ import org.junit.Test;
 import shared.ItemType;
 import AGV.Location;
 import Monitoring.Monitor;
-import Monitoring.MonitoringGUI;
 import AGV.Area;
 import warehouse.Database;
 import warehouse.ShelfType;
 import warehouse.AGVInterface;
 
-import java.awt.EventQueue;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertEquals;
@@ -31,10 +29,10 @@ public class TestAGV {
         Database.getInstance().initTestDB();
         //add enough items so no reorder is triggered
         
-        Location l1 = Area.getLocation(Location.LocationType.FLOORSHELF, 0);
+        Location l1 = Area.getLocation(Location.LocationType.FLOOR_SHELF, 0);
         Location r1 = Area.getLocation(Location.LocationType.PRODUCTION_LINE, 1);
-        Location l2 = Area.getLocation(Location.LocationType.TOPSHELF1, 1);
-        Location l3 = Area.getLocation(Location.LocationType.FLOORSHELF, 33);
+        Location l2 = Area.getLocation(Location.LocationType.TOP_SHELF1, 1);
+        Location l3 = Area.getLocation(Location.LocationType.FLOOR_SHELF, 33);
         
         agv.startAGV();
 
@@ -76,7 +74,7 @@ public class TestAGV {
         AGV agv = AGV.getInstance();
         RobotScheduler.getInstance().startRobotArms();
         Database.getInstance().initTestDB();	 
-        Location l1 = Area.getLocation(Location.LocationType.FLOORSHELF, 0);
+        Location l1 = Area.getLocation(Location.LocationType.FLOOR_SHELF, 0);
         Location r0 = Area.getLocation(Location.LocationType.PRODUCTION_LINE, 0);
         ShelfType s = AGVInterface.getItemLocation(ItemType.RED_PAINT);
         Location l2 = Area.getLocation(s.getType(), s.getId());
@@ -157,10 +155,10 @@ public static void main(String[] args) {
 		
 		
 		//=====STUPID TEST====
-		Location l1 = Area.getLocation(Location.LocationType.FLOORSHELF, 0);
+		Location l1 = Area.getLocation(Location.LocationType.FLOOR_SHELF, 0);
 		Location r1 = Area.getLocation(Location.LocationType.PRODUCTION_LINE, 1);
-        Location l2 = Area.getLocation(Location.LocationType.TOPSHELF1, 1);
-        Location l3 = Area.getLocation(Location.LocationType.FLOORSHELF, 33);
+        Location l2 = Area.getLocation(Location.LocationType.TOP_SHELF1, 1);
+        Location l3 = Area.getLocation(Location.LocationType.FLOOR_SHELF, 33);
         
         AGV agv = AGV.getInstance();
 //        agv.getAGVTaskScheduler().createTask(l1, r1, ItemType.SCREW);

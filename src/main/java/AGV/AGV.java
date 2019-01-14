@@ -43,7 +43,7 @@ public class AGV {
     }
 
     static void openGui() {
-        JFrame frame = new JFrame("My First GUI");
+        JFrame frame = new JFrame("AGV");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(1000,400);
         String[] colNames = {"ID", "Availability Status", "Current Location"};

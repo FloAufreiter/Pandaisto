@@ -1,6 +1,4 @@
 package AGV;
-
-import shared.ItemContainer;
 import shared.ItemType;
 
 class Task {

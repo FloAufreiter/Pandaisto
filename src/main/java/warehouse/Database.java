@@ -178,9 +178,9 @@ public class Database {
 
 	private Location.LocationType levelToLoc(int level) {
     	switch(level) {
-			case 0: return Location.LocationType.FLOORSHELF;
-			case 1: return Location.LocationType.TOPSHELF1;
-			case 2: return Location.LocationType.TOPSHELF2;
+			case 0: return Location.LocationType.FLOOR_SHELF;
+			case 1: return Location.LocationType.TOP_SHELF1;
+			case 2: return Location.LocationType.TOP_SHELF2;
 		}
 		return null;
 	}

@@ -6,7 +6,6 @@ import es.usc.citius.hipster.graph.GraphSearchProblem;
 import es.usc.citius.hipster.graph.HipsterGraph;
 import es.usc.citius.hipster.model.impl.WeightedNode;
 import es.usc.citius.hipster.model.problem.SearchProblem;
-import warehouse.Database;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ public class Area {
 
     public static Location getLocation(Location.LocationType type, int id) {
         switch (type) {
-            case FLOORSHELF: case TOPSHELF1: case TOPSHELF2:
+            case FLOOR_SHELF: case TOP_SHELF1: case TOP_SHELF2:
                 return SHELVES.get(id);
             case PRODUCTION_LINE:
                 return ROBOT_ARMS.get(id);
@@ -56,7 +55,7 @@ public class Area {
         Location prev = null;
         for (int i = 0; i < 60; i++) {
             //floor shelves
-            Location fs = new Location(Location.LocationType.FLOORSHELF, i);
+            Location fs = new Location(Location.LocationType.FLOOR_SHELF, i);
             if (prev != null) {
                 gb.connect(prev).to(fs).withEdge(1d);
             }
@@ -64,12 +63,12 @@ public class Area {
             prev = fs;
             //first floor shelves
             int ts1_id = ++i;
-            Location ts1 = new Location(Location.LocationType.TOPSHELF1, ts1_id);
+            Location ts1 = new Location(Location.LocationType.TOP_SHELF1, ts1_id);
             gb.connect(fs).to(ts1).withEdge(0d);
             SHELVES.put(ts1_id, ts1);
             //second floor shelves
             int ts2_id = ++i;
-            Location ts2 = new Location(Location.LocationType.TOPSHELF2, ts2_id);
+            Location ts2 = new Location(Location.LocationType.TOP_SHELF2, ts2_id);
             gb.connect(ts1).to(ts2).withEdge(0d);
             SHELVES.put(ts2_id, ts2);
         }
