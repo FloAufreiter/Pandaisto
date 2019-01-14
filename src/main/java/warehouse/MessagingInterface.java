@@ -17,9 +17,10 @@ public abstract class MessagingInterface {
 	 * Method for getting item from database
 	 * @return int representing item location in warehouse, -1 otherwise
 	 */
-	public static ShelfType getFreeItemLocation(ItemContainer container) {
+	public static ShelfType getFreeItemLocation() {
 		try {
 			int id = Database.getInstance().getFreeShelf();
+			if(id < 0) return null;
 			Location.LocationType level = Database.getInstance().getLevel(id);
 			ShelfType s = new ShelfType(id, level);
 			return s;
@@ -33,6 +34,7 @@ public abstract class MessagingInterface {
 	public static ShelfType getItemLocation(ItemType type) {
 		try {
 			int id = Database.getInstance().itemByType(type.toString());
+			if(id < 0) return null;
 			Location.LocationType level = Database.getInstance().getLevel(id);
 			return new ShelfType(id, level);
 		} catch (SQLException e) {

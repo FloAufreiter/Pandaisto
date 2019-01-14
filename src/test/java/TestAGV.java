@@ -137,16 +137,24 @@ public class TestAGV {
 		assertEquals(0, db.itemsInStock(ItemType.RED_PAINT));
 	}
 
+    @Test
+    public void checkShelf11() throws SQLException {
+    	Database db = Database.getInstance();
+    	db.initTestDB();
+    	db.deleteItem(11);
+    	assertEquals(4, db.itemsInStock(ItemType.CAR_BODY));
+    	db.deleteTestDB();
+    }
 //THIS SHOULD BE IN MONITOR BUT DEPENDENCIES ARE FUCKED
 public static void main(String[] args) {
-		
+	try {
+		Database.getInstance().initTestDB();
+	} catch (SQLException e1) {
+		e1.printStackTrace();
+		System.exit(-1); //SHIT
+	}
 	Monitor.getInstance();
-		try {
-			Database.getInstance().initTestDB();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-			System.exit(-1); //SHIT
-		}
+		
 		
 		//=====STUPID TEST====
 		Location l1 = Area.getLocation(Location.LocationType.FLOORSHELF, 0);
@@ -158,7 +166,7 @@ public static void main(String[] args) {
 //        agv.getAGVTaskScheduler().createTask(l1, r1, ItemType.SCREW);
         try {
 			Thread.sleep(1000);
-			agv.getAGVTaskScheduler().createTask(l2, l3, ItemType.SCREW);
+			//agv.getAGVTaskScheduler().createTask(l2, l3, ItemType.SCREW);
 	        Thread.sleep(20000);//sleep to make sure 2 forklifts are started
 	        
         } catch (InterruptedException e) {
@@ -167,15 +175,10 @@ public static void main(String[] args) {
 		}
         
         //====STUPID TEST END===
-        
-        try {
-			Database.getInstance().deleteWarehouse(0);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+       
 		while(true) {
 			
-		}	
+		}
+		
 	}
 }

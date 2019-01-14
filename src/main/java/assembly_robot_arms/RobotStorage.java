@@ -20,7 +20,9 @@ public class RobotStorage {
     public RobotStorage(ItemType type, int maxNrOfElements, int minNrOfElements) {
         this.type = type;
         this.maxNrOfElements = maxNrOfElements;
-        this.minNrOfElements = minNrOfElements;
+        //TODO: TEST
+        //this.minNrOfElements = minNrOfElements;
+        this.minNrOfElements = 1;
     }
 
     public void removeElement() {

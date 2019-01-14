@@ -58,6 +58,7 @@ public class Monitor implements Runnable {
     }
     
     public void createCustomerOrder(int amount, ItemType itemType, Customer customer) {
+    	rob.startRobotArms();
         onlineStore.createCustomerOrder(amount, itemType, customer);
     }
 
@@ -95,11 +96,98 @@ public class Monitor implements Runnable {
     		agv = AGV.getInstance();
     		agv.startAGV();
     		rob = RobotScheduler.getInstance();
-    		rob.startRobotArms();
     	}
         return monitor;
         
     }
+    
+    public void requestItemForProductionLine(int locID, ItemType item) {
+    	Location prodLine = Area.getLocation(Location.LocationType.PRODUCTION_LINE, locID);
+     
+    	TaskScheduler ts = AGV.getInstance().getAGVTaskScheduler();
+        boolean task_created = false;
+        ShelfType st = null;
+        Location shelfLoc;
+        while(st == null) {
+            //ask Warehouse where to bring
+            st = MonitoringInterface.getItemLocation(item);
+            if(st == null)
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			else {
+            	shelfLoc = Area.getLocation(st.getType(), st.getId());
+            
+                while (!task_created) {
+                        task_created = ts.createTask(shelfLoc, prodLine, item);
+                    	
+                }
+			}       
+        }
+    }
+    public void removeItemForProductionLine(int locID, int amount, ItemType item) {
+        	Location prodLine = Area.getLocation(Location.LocationType.PRODUCTION_LINE, locID);
+         
+//        	TaskScheduler ts = AGV.getInstance().getAGVTaskScheduler();
+//            boolean task_created = false;
+//            ShelfType st = null;
+//            Location shelfLoc;
+//            while(st == null) {
+//                //ask Warehouse where to bring
+//                st = MonitoringInterface.getFreeItemLocation(new ItemContainer(amount, item));
+//                if(st == null)
+//    				try {
+//    					Thread.sleep(1000);
+//    				} catch (InterruptedException e) {
+//    					// TODO Auto-generated catch block
+//    					e.printStackTrace();
+//    				}
+//    			else {
+//                	shelfLoc = Area.getLocation(st.getType(), st.getId());
+//                
+//                    while (!task_created) {
+//                            task_created = ts.createTask(prodLine, shelfLoc, item);
+//                        	
+//                    }
+//                        
+//            }
+//        }
+            TaskScheduler ts = AGV.getInstance().getAGVTaskScheduler();
+
+            boolean task_created = false;
+            ShelfType st = null;
+            Location l2;
+            for(int i = 0; i < amount; i++) {
+                while(st == null) {
+                    //ask Warehouse where to bring
+                    st = MonitoringInterface.getFreeItemLocation();
+                    if(st == null)
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					else {
+                    	l2 = Area.getLocation(st.getType(), st.getId());
+                    
+	                    while (!task_created) {
+	                            task_created = ts.createTask(prodLine, Area.getLocation(st.getType(), st.getId()), item);
+	                        	
+	                    }
+	                    
+                    }
+                }
+                if(task_created) {
+                	st = null;
+                	task_created = false;
+                }
+            }
+}
+
     
     public int getNumberOfOngoingComponentsOrders() {
 		return ONGOING_ORDERS.size();
@@ -153,7 +241,6 @@ public class Monitor implements Runnable {
         @Override
         public void run() {
             try {
-                Thread.sleep(1000);
                 TaskScheduler ts = AGV.getInstance().getAGVTaskScheduler();
                 //TODO which Order IF
                 boolean task_created = false;
@@ -164,7 +251,7 @@ public class Monitor implements Runnable {
                 for(int i = 0; i < order.getAmount(); i++) {
 	                while(st == null) {
 	                    //ask Warehouse where to bring
-	                    st = MonitoringInterface.getFreeItemLocation(order);
+	                    st = MonitoringInterface.getFreeItemLocation();
 	                    if(st == null) Thread.sleep(1000);
 	                    else {
 	                    	l2 = Area.getLocation(st.getType(), st.getId());

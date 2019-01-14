@@ -120,6 +120,8 @@ public class BeltSegment {
 				g.fillRect(x+7, y+12, 10, 5);
 				break;
 			default:
+				g.setColor(Color.BLACK);
+				g.fillOval(x, y, 25, 25);
 				break;
 		
 			}

@@ -131,6 +131,9 @@ public class BeltControlSystem implements Runnable{
 	public void lockBeltAt(int beltId){
 		getBeltSegment(beltId).lockSegment();
 	}
+	public void unlockBeltAt(int beltId) {
+		getBeltSegment(beltId).unlockSegment();
+	}
 	public ItemType getItemTypeAt(int beltId) {
 		return getBeltSegment(beltId).getItemType();
 	}

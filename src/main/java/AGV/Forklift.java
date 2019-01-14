@@ -72,12 +72,12 @@ class Forklift implements Runnable {
 	                case unprocessed:
 	                    loadCommodity(t.getItemType(), nearest);
 	                    t.switchState();
-	                    System.out.println("done loading" +t.getId());
+	                    //System.out.println("done loading" +t.getId());
 	                    break;
 	                case loaded:
 	                    unloadCommodity(t.getItemType(), nearest);
 	                    t.switchState();
-	                    System.out.println("done unloading" + t.getId());
+	                   // System.out.println("done unloading" + t.getId());
 	                    break;
 	                case finished:
 	                    break;
@@ -109,7 +109,7 @@ class Forklift implements Runnable {
     private void driveToLocation(Location location) {
         Double d = Area.getMinimalCostFrom(this.getCurrentLocation(), location);
         try {
-            Thread.sleep(Math.round(d * 1000));
+            Thread.sleep(Math.round(d * 800));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -128,23 +128,23 @@ class Forklift implements Runnable {
         try {
             switch (location.getType()) {
                 case FLOORSHELF:
-                	System.out.println(Thread.currentThread().getId() + " loading floorshelf");
+                	//System.out.println(Thread.currentThread().getId() + " loading floorshelf");
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
                 case TOPSHELF1:
-                	System.out.println(Thread.currentThread().getId() + " loading topshelf1");
+                	//System.out.println(Thread.currentThread().getId() + " loading topshelf1");
                     setForkHeight(FORKHEIGHT_1);
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
                 case TOPSHELF2:
-                	System.out.println(Thread.currentThread().getId() + " loading topshelf2");
+                	//System.out.println(Thread.currentThread().getId() + " loading topshelf2");
                     setForkHeight(FORKHEIGHT_2);
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
                 case PRODUCTION_LINE:
                     RobotScheduler.get(location.getId()).removeElement();
             }
-            Thread.sleep(600); //TODO: changed for faster testing!
+            Thread.sleep(100); //TODO: changed for faster testing!
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -168,7 +168,7 @@ class Forklift implements Runnable {
                     AGVInterface.confirmItemAdded(location.getId(), it);
                     break;
                 case PRODUCTION_LINE:
-                   RobotScheduler.get(location.getId()).addElement();
+                   RobotScheduler.get(location.getId()).addElement(it);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

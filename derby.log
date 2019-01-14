@@ -1,4 +1,4 @@
-Mon Jan 14 12:59:55 CET 2019 Thread[main,5,main] Cleanup action starting
+Mon Jan 14 17:38:56 CET 2019 Thread[main,5,main] Cleanup action starting
 java.sql.SQLException: Database './warehouseDB' not found.
 	at org.apache.derby.impl.jdbc.SQLExceptionFactory.getSQLException(Unknown Source)
 	at org.apache.derby.impl.jdbc.SQLExceptionFactory.getSQLException(Unknown Source)
@@ -19,12 +19,11 @@ java.sql.SQLException: Database './warehouseDB' not found.
 	at warehouse.Database.<init>(Database.java:79)
 	at warehouse.Database.getInstance(Database.java:41)
 	at warehouse.Database.<clinit>(Database.java:23)
-	at Monitoring.Monitor.getInstance(Monitor.java:90)
-	at TestAGV.main(TestAGV.java:143)
+	at TestAGV.main(TestAGV.java:151)
 Caused by: ERROR XJ004: Database './warehouseDB' not found.
 	at org.apache.derby.iapi.error.StandardException.newException(Unknown Source)
 	at org.apache.derby.impl.jdbc.SQLExceptionFactory.wrapArgsForTransportAcrossDRDA(Unknown Source)
-	... 21 more
+	... 20 more
 ============= begin nested exception, level (1) ===========
 ERROR XJ004: Database './warehouseDB' not found.
 	at org.apache.derby.iapi.error.StandardException.newException(Unknown Source)
@@ -48,13 +47,12 @@ ERROR XJ004: Database './warehouseDB' not found.
 	at warehouse.Database.<init>(Database.java:79)
 	at warehouse.Database.getInstance(Database.java:41)
 	at warehouse.Database.<clinit>(Database.java:23)
-	at Monitoring.Monitor.getInstance(Monitor.java:90)
-	at TestAGV.main(TestAGV.java:143)
+	at TestAGV.main(TestAGV.java:151)
 ============= end nested exception, level (1) ===========
 Cleanup action completed
 ----------------------------------------------------------------
-Mon Jan 14 12:59:55 CET 2019:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0168-4c3b-850a-00000e784990 
+Mon Jan 14 17:38:56 CET 2019:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0168-4d3a-f7b2-00000f1849d8 
 on database directory /home/tom/git/Pandaisto/warehouseDB with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1de0aca6 
 Loaded from file:/home/tom/.gradle/caches/modules-2/files-2.1/org.apache.derby/derby/10.14.2.0/7efad40ef52fbb1f08142f07a83b42d29e47d8ce/derby-10.14.2.0.jar
 java.vendor=Oracle Corporation

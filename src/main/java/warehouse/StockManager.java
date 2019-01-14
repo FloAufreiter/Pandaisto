@@ -38,7 +38,7 @@ public class StockManager implements DBListener{
 			try {
 				System.out.println(Database.getInstance().itemsInStock(e.itemType));
 				if(Database.getInstance().itemsInStock(e.itemType) < criticalStock.get(e.itemType) &&
-						!deliveryPending.get(e.itemType)) {
+						!deliveryPending.get(e.itemType) && ! (e.itemType.equals(ItemType.FINISHED_BLUE_CAR) || e.itemType.equals(ItemType.FINISHED_RED_CAR))) {
 					deliveryPending.put(e.itemType, true);
 					requestNewOrder(e.itemType);
 				}

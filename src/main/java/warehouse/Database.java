@@ -253,6 +253,7 @@ public class Database {
      */
     public boolean deleteItem(int shelfID) {
 		synchronized (deleteItemStmt) {
+			
 			String itemType = "";
 	    	try {
 	    		itemByIDStmt.setInt(1, shelfID);
@@ -263,6 +264,7 @@ public class Database {
 	    		deleteItemStmt.setInt(1, shelfID);
 	    		deleteItemStmt.executeUpdate();
 	    		warehousePrint(itemType + " DELETED FROM SHELF " + shelfID);
+		    	
 	    	} catch(SQLException e) {
 	    		e.printStackTrace();
 	    		return false;

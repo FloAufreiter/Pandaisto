@@ -29,7 +29,7 @@ public class TaskScheduler implements Runnable {
     }
 
     private void initForklifts() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 30; i++) {
             forklifts.add(new Forklift());
         }
     }
@@ -49,7 +49,7 @@ public class TaskScheduler implements Runnable {
                     }
                 }
                 nearest_free.addTask(t);
-                System.out.println("ADDED TASK " + t.getId());
+                //System.out.println("ADDED TASK " + t.getId());
                 nearest_free.setStatus(Forklift.Status.IN_USE);
                 if (nearest_free.isFullyLoaded()) {
                 	
@@ -80,7 +80,7 @@ public class TaskScheduler implements Runnable {
     }
 
     public synchronized boolean createTask(Location location1, Location location2, ItemType itemType) {
-    	System.out.println("TASK CREATED");
+    	//System.out.println("TASK CREATED");
         if (tasks.size() == 100) {
             return false;
         } else {
