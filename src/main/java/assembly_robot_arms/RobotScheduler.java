@@ -8,12 +8,6 @@ public class RobotScheduler {
 	private Thread[] threads = new Thread[16];
 	private BeltControlSystem belt;
 	private static RobotScheduler INSTANCE = null;
-	//private static boolean STOP = true;
-
-//	public static RobotScheduler getRobotScheduler() {
-	//	return INSTANCE;
-	//}
-	
 	private RobotScheduler(BeltControlSystem belt) {
 		this.belt = belt;
 	}
@@ -32,14 +26,6 @@ public class RobotScheduler {
 	public static Arm get(int id) {
 		return arms[id];
 	}
-
-//	public void start() {
-//		STOP = false;
-//	}
-//
-//	public void stop() {
-//		STOP = true;
-//	}
 
 	public void startRobotArms() {
 		initArms();

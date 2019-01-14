@@ -1,9 +1,7 @@
 package shared;
 
-import Monitoring.Order;
+public class ItemContainer {
 
-public class ItemContainer extends Order {
-	
 	int amount;
 
 	public int getAmount() {
@@ -19,7 +17,4 @@ public class ItemContainer extends Order {
 		this.amount = amount;
 		this.itemType = itemType;
 	}
-	
-
-
 }

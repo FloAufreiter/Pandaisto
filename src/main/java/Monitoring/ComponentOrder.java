@@ -3,7 +3,7 @@ package Monitoring;
 import shared.ItemContainer;
 import shared.ItemType;
 
-public class ComponentOrder extends Order{
+public class ComponentOrder {
 
 	Supplier supplier;
 	

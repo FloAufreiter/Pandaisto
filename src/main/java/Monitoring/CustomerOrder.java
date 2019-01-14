@@ -1,18 +1,11 @@
 package Monitoring;
-
-import java.util.ArrayList;
-
 import shared.ItemContainer;
 import shared.ItemType;
 
-public class CustomerOrder extends Order{
-	
-	
+public class CustomerOrder {
 	Customer customer;
 	
 	ItemContainer container;
-	
-	
 	
 	public CustomerOrder(int amount, ItemType itemType, Customer customer) {
 		

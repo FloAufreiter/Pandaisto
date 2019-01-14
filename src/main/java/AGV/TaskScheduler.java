@@ -79,6 +79,7 @@ public class TaskScheduler implements Runnable {
     }
 
     public synchronized boolean createTask(Location location1, Location location2, ItemType itemType) {
+        if(location1 == null || location2 == null) return false;
     	//System.out.println("TASK CREATED");
         if (tasks.size() == 100) {
             return false;

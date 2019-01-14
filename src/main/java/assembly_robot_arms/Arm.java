@@ -2,11 +2,9 @@ package assembly_robot_arms;
 
 import conveyor.BeltControlSystem;
 import shared.ItemType;
-import warehouse.MessagingInterface;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import Monitoring.Monitor;
 
@@ -45,7 +43,7 @@ public class Arm implements Runnable {
         try {
             if (type.isEmpty()) return;
 	            if(type.get(0).type != ItemType.FINISHED_BLUE_CAR && type.get(0).type != ItemType.FINISHED_RED_CAR)
-	            {	
+	            {
 	            if(waitingForItem && type.get(0).nrOfElements >= type.get(0).minNrOfElements) {
 	            	waitingForItem = false;
 	            	bcs.unlockBeltAt(beltID);

@@ -1,13 +1,13 @@
 import AGV.AGV;
+import AGV.Area;
+import AGV.Location;
+import Monitoring.Monitor;
 import assembly_robot_arms.RobotScheduler;
 import org.junit.Test;
 import shared.ItemType;
-import AGV.Location;
-import Monitoring.Monitor;
-import AGV.Area;
+import warehouse.AGVInterface;
 import warehouse.Database;
 import warehouse.ShelfType;
-import warehouse.AGVInterface;
 
 import java.sql.SQLException;
 
@@ -71,23 +71,4 @@ public class TestAGV {
     	assertEquals(5, db.itemsInStock(ItemType.SCREW));
     	db.deleteTestDB();
     }
-   
-
-//THIS SHOULD BE IN MONITOR BUT DEPENDENCIES ARE FUCKED
-public static void main(String[] args) {
-	try {
-		Database.getInstance().initTestDB();
-	} catch (SQLException e1) {
-		e1.printStackTrace();
-		System.exit(-1); //SHIT
-	}
-	Monitor.getInstance();
-		
-		
-       
-		while(true) {
-			
-		}
-		
-	}
 }

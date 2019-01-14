@@ -2,13 +2,7 @@ package warehouse;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Date;
-import java.util.stream.Stream;
-
-//import org.apache.derby.iapi.services.io.FileUtil;
 
 /**
  * Class for handling automatic backups

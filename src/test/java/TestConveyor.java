@@ -1,8 +1,6 @@
-import static org.junit.Assert.*;
-
-import org.junit.Test;
 import conveyor.BeltControlSystem;
-import shared.*;
+import org.junit.Test;
+import shared.ItemType;
 
 public class TestConveyor {
 	@Test

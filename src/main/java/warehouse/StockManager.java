@@ -1,10 +1,10 @@
 package warehouse;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-
 import Monitoring.Monitor;
 import shared.ItemType;
+
+import java.sql.SQLException;
+import java.util.HashMap;
 
 /**
  * Class handling warehouse stock. This class is responsible for issuing new orders 

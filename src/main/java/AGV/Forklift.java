@@ -92,7 +92,11 @@ class Forklift implements Runnable {
         Location nearest = null;
         double min_cost = Double.MAX_VALUE;
         for (Location l : route.getStops().keySet()) {
+            System.out.println("in getNearest Function:");
+            System.out.println(this.getCurrentLocation());
+            System.out.println(l);
             Double d = Area.getMinimalCostFrom(this.getCurrentLocation(), l);
+            System.out.println("mincost: " + d);
             if (d < min_cost) {
                 min_cost = d;
                 nearest = l;

@@ -1,11 +1,10 @@
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import shared.ItemType;
+import warehouse.Database;
 
 import java.sql.SQLException;
 
-import org.junit.Test;
-
-import shared.ItemType;
-import warehouse.Database;
+import static org.junit.Assert.assertEquals;
 
 public class TestWarehouse {
 

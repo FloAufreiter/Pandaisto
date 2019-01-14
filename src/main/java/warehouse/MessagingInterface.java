@@ -1,10 +1,9 @@
 package warehouse;
 
-import java.sql.SQLException;
-
 import AGV.Location;
-import shared.ItemContainer;
 import shared.ItemType;
+
+import java.sql.SQLException;
 
 /**
  * Abstract Class for other systems to send messages to warehouse subsystem

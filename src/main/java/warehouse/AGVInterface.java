@@ -1,6 +1,4 @@
 package warehouse;
-
-import shared.ItemContainer;
 import shared.ItemType;
 
 import java.sql.SQLException;
