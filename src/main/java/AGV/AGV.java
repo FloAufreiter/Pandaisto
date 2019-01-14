@@ -8,10 +8,6 @@ import java.awt.*;
 public class AGV {
     private static TaskScheduler scheduler;
 
-    public static Thread getSchedulerThread() {
-        return schedulerThread;
-    }
-
     private static Thread schedulerThread;
     private static Area area;
     static private DefaultTableModel model;
