@@ -95,6 +95,7 @@ public class Monitor implements Runnable {
     		agv = AGV.getInstance();
     		agv.startAGV();
     		rob = RobotScheduler.getInstance();
+    		rob.startRobotArms();
     	}
         return monitor;
         

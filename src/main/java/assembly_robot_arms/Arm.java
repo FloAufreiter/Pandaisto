@@ -138,7 +138,8 @@ public class Arm implements Runnable {
 
     @Override
     public void run() {
-        while (!stop) {
+        System.out.println("ROBOT ARM " + this.id + " STARTED");
+    	while (!stop) {
             work();
         }
     }

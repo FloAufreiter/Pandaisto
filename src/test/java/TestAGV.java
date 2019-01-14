@@ -41,7 +41,7 @@ public class TestAGV {
 //        agv.getAGVTaskScheduler().createTask(l1, r1, ItemType.SCREW);
         Thread.sleep(1000);
         agv.getAGVTaskScheduler().createTask(l2, l3, ItemType.SCREW);
-        Thread.sleep(20000);//sleep to make sure 2 forklifts are started
+        Thread.sleep(30000);//sleep to make sure 2 forklifts are started
         assertEquals(5, Database.getInstance().itemsInStock(ItemType.SCREW));
         agv.stopAGV();
         Database.getInstance().deleteWarehouse(0);
@@ -59,7 +59,7 @@ public class TestAGV {
     }
 
     @Test
-    public void checkItemStock() throws SQLException {
+    public void checkItemStock1() throws SQLException {
     	Database db = Database.getInstance();
     	db.insertWarehouse(10, 100);
     	for(int i = 0; i < 100; i ++) db.insertShelf(i+1000, 10, 0);
@@ -102,15 +102,12 @@ public class TestAGV {
     public void testItemReorder() throws SQLException, InterruptedException {
     	Database db = Database.getInstance();
     	db.initTestDB();
-    	AGV a = AGV.getInstance();
-    	a.startAGV();
-    	assertEquals(20, db.itemsInStock(ItemType.SCREW));
-    	for(int i = 0; i < 11; i++) db.deleteItem(i);
+    	assertEquals(5, db.itemsInStock(ItemType.SCREW));
+    	for(int i = 0; i < 3; i++) db.deleteItem(i);
     	Thread.sleep(60000); //wait long enough for forklifts 
 //    	a.stopAGV();
 //        AGV.getSchedulerThread().join();
-    	assertEquals(19, db.itemsInStock(ItemType.SCREW));
-    	a.stopAGV();
+    	assertEquals(5, db.itemsInStock(ItemType.SCREW));
     	db.deleteTestDB();
     }
     
@@ -127,7 +124,20 @@ public class TestAGV {
 
     }
     
-    //THIS SHOULD BE IN MONITOR BUT DEPENDENCIES ARE FUCKED
+    @Test
+	public void checkItemStock() throws SQLException {
+		Database db = Database.getInstance();
+		db.insertWarehouse(10, 100);
+		for(int i = 0; i < 100; i ++) db.insertShelf(i+1000, 10, 0);
+		for(int i = 0; i < 100; i++) db.insertItem(i+1000, ItemType.RED_PAINT);
+		assertEquals(100, db.itemsInStock(ItemType.RED_PAINT));
+		db.deleteItem(1000);
+		assertEquals(99, db.itemsInStock(ItemType.RED_PAINT));
+		db.deleteWarehouse(10);
+		assertEquals(0, db.itemsInStock(ItemType.RED_PAINT));
+	}
+
+//THIS SHOULD BE IN MONITOR BUT DEPENDENCIES ARE FUCKED
 public static void main(String[] args) {
 		
 	Monitor.getInstance();
@@ -137,22 +147,27 @@ public static void main(String[] args) {
 			e1.printStackTrace();
 			System.exit(-1); //SHIT
 		}
+		
+		//=====STUPID TEST====
 		Location l1 = Area.getLocation(Location.LocationType.FLOORSHELF, 0);
-        Location r1 = Area.getLocation(Location.LocationType.PRODUCTION_LINE, 1);
+		Location r1 = Area.getLocation(Location.LocationType.PRODUCTION_LINE, 1);
         Location l2 = Area.getLocation(Location.LocationType.TOPSHELF1, 1);
-        Location l3 = Area.getLocation(Location.LocationType.FLOORSHELF, 3);
+        Location l3 = Area.getLocation(Location.LocationType.FLOORSHELF, 33);
         
         AGV agv = AGV.getInstance();
-        agv.getAGVTaskScheduler().createTask(l1, r1, ItemType.SCREW);
+//        agv.getAGVTaskScheduler().createTask(l1, r1, ItemType.SCREW);
         try {
 			Thread.sleep(1000);
 			agv.getAGVTaskScheduler().createTask(l2, l3, ItemType.SCREW);
-	        Thread.sleep(10000);//sleep to make sure 2 forklifts are started
+	        Thread.sleep(20000);//sleep to make sure 2 forklifts are started
 	        
         } catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        
+        //====STUPID TEST END===
+        
         try {
 			Database.getInstance().deleteWarehouse(0);
 		} catch (SQLException e) {
