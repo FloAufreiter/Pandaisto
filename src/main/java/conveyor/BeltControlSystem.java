@@ -75,7 +75,7 @@ public class BeltControlSystem implements Runnable{
 	}
 	public boolean addItemAt(int beltID, ItemType item) {
 		synchronized(this) {
-			return getBeltSegment(beltID).addItem(item); //this will change a bit when the ItemType is added
+			return getBeltSegment(beltID).addItem(item); 
 		}
 	}
 	
