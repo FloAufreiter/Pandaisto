@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
-import org.apache.commons.io.FileUtils;
+//import org.apache.commons.io.FileUtils;
 
 /**
  * Class for handling automatic backups
@@ -68,7 +68,7 @@ public class BackupManager extends Thread {
 	 * @throws IOException
 	 */
 	private void copyDB() throws IOException {
-		Database.warehousePrint("CREATING BACKUP");
+		/*Database.warehousePrint("CREATING BACKUP");
 		try {
 			Database.getInstance().lockDB();
 		} catch (SQLException e) {
@@ -95,7 +95,7 @@ public class BackupManager extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+		}*/
 		Database.warehousePrint("BACKUP DONE");
 	}
 }

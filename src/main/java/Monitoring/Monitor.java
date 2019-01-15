@@ -94,6 +94,7 @@ public class Monitor implements Runnable {
     		System.out.println("CHECK ONGOING ORDERS");
     		CustomerOrder oldestOngoingOrder = onlineStore.getOldestOngoingOrders();
     		
+    		if(oldestOngoingOrder != null) {
     			try {
 				if(warehouse.itemsInStock(oldestOngoingOrder.getContainer().getItemType()) >= oldestOngoingOrder.getContainer().getAmount()){
 					int shelfId = warehouse.itemByType(oldestOngoingOrder.getContainer().getItemType().toString());
@@ -107,9 +108,9 @@ public class Monitor implements Runnable {
 					System.out.println("NOT ENOUGH PRODUCED CARS: " + warehouse.itemsInStock(oldestOngoingOrder.getContainer().getItemType()) + " " + oldestOngoingOrder.getContainer().getItemType().toString());
 				}
 			} catch (SQLException e) {
-				return;
-				
-			};   		
+				return;				
+			}
+    		}
     }
 
     public void createCustomerOrder(int amount, ItemType itemType, Customer customer) {
