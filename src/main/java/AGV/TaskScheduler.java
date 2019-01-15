@@ -42,7 +42,7 @@ public class TaskScheduler implements Runnable {
                 Task t = tasks.take();
                 Forklift nearest_free = null;
                 for (Forklift f : freeLifters) {
-                    Double d = Area.getMinimalCostFrom(f.getCurrentLocation(), t.getLocationA());
+                    Double d = Area.getInstance().getMinimalCostFrom(f.getCurrentLocation(), t.getLocationA());
                     if (d < min_cost && f.canAcceptTask(t)) {
                         min_cost = d;
                         nearest_free = f;
@@ -80,11 +80,9 @@ public class TaskScheduler implements Runnable {
 
     public synchronized boolean createTask(Location location1, Location location2, ItemType itemType) {
         if(location1 == null || location2 == null) return false;
-    	//System.out.println("TASK CREATED");
         if (tasks.size() == 100) {
             return false;
         } else {
-            //TODO change Commodity to ItemContainer
             Task t = new Task(location1, location2, itemType);
             try {
                 tasks.add(t);

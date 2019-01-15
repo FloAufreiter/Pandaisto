@@ -114,7 +114,7 @@ public class Monitor implements Runnable {
     }
 
     public void requestItemForProductionLine(int locID, ItemType item) {
-        Location prodLine = Area.getLocation(Location.LocationType.PRODUCTION_LINE, locID);
+        Location prodLine = Area.getInstance().getLocation(Location.LocationType.PRODUCTION_LINE, locID);
 
         TaskScheduler ts = AGV.getInstance().getAGVTaskScheduler();
         boolean task_created = false;
@@ -131,7 +131,7 @@ public class Monitor implements Runnable {
                     e.printStackTrace();
                 }
             else {
-                shelfLoc = Area.getLocation(st.getType(), st.getId());
+                shelfLoc = Area.getInstance().getLocation(st.getType(), st.getId());
                 while (!task_created) {
                     task_created = ts.createTask(shelfLoc, prodLine, item);
                     if(!task_created) {
@@ -146,7 +146,7 @@ public class Monitor implements Runnable {
     }
 
     public void removeItemForProductionLine(int locID, int amount, ItemType item) {
-        Location prodLine = Area.getLocation(Location.LocationType.PRODUCTION_LINE, locID);
+        Location prodLine = Area.getInstance().getLocation(Location.LocationType.PRODUCTION_LINE, locID);
         TaskScheduler ts = AGV.getInstance().getAGVTaskScheduler();
 
         boolean task_created = false;
@@ -164,7 +164,7 @@ public class Monitor implements Runnable {
                         e.printStackTrace();
                     }
                 else {
-                    l2 = Area.getLocation(st.getType(), st.getId());
+                    l2 = Area.getInstance().getLocation(st.getType(), st.getId());
                     while (!task_created) {
                         task_created = ts.createTask(prodLine, l2, item);
 
@@ -235,7 +235,7 @@ public class Monitor implements Runnable {
                 boolean task_created = false;
                 ShelfType st = null;
                 Random rand = new Random();
-                Location l1 = Area.getLocation(Location.LocationType.LOADING_DOCK, rand.nextInt(3)); //TODO random which loading 0-3
+                Location l1 = Area.getInstance().getLocation(Location.LocationType.LOADING_DOCK, rand.nextInt(3)); //TODO random which loading 0-3
                 Location l2;
                 for (int i = 0; i < order.getAmount(); i++) {
                     while (st == null) {
@@ -243,7 +243,7 @@ public class Monitor implements Runnable {
                         st = MonitoringInterface.getFreeItemLocation();
                         if (st == null) Thread.sleep(1000);
                         else {
-                            l2 = Area.getLocation(st.getType(), st.getId());
+                            l2 = Area.getInstance().getLocation(st.getType(), st.getId());
 
                             while (!task_created) {
                                 task_created = ts.createTask(l1, l2, order.getItemType());

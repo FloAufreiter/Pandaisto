@@ -7,5 +7,4 @@ public class Supplier {
 	public Supplier(String name) {
 		this.name = name;		
 	}
-
 }

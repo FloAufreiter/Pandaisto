@@ -11,8 +11,7 @@ class Task {
     private ItemType itemType;
     private State currentState = State.unprocessed;
     //long deadline;
-
-
+    
     Task(Location locationA, Location locationB, ItemType itemType) {
         this.id = ids;
         ids++;

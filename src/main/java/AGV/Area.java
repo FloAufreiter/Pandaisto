@@ -7,7 +7,6 @@ import es.usc.citius.hipster.graph.HipsterGraph;
 import es.usc.citius.hipster.model.impl.WeightedNode;
 import es.usc.citius.hipster.model.problem.SearchProblem;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -20,15 +19,17 @@ public class Area {
     private static Map<Integer, Location> SHELVES = new HashMap<>();
     private static Map<Integer, Location> DOCKS = new HashMap<>();
 
-    Area() {
-        try {
+    private static Area instance = new Area();
+
+    private Area() {
             buildGraph();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
-    public static Location getLocation(Location.LocationType type, int id) {
+    public static Area getInstance() {
+        return instance;
+    }
+
+    public Location getLocation(Location.LocationType type, int id) {
         switch (type) {
             case FLOOR_SHELF: case TOP_SHELF1: case TOP_SHELF2:
                 return SHELVES.get(id);
@@ -48,7 +49,7 @@ public class Area {
         return (Location) locations[random.nextInt(locations.length)];
     }
 
-    private static void buildGraph() throws SQLException { //should later be done by Spec-File
+    private static void buildGraph() { //should later be done by Spec-File
         GraphBuilder<Location, Double> gb = GraphBuilder.create();
 
         //shelves
@@ -110,7 +111,7 @@ public class Area {
         }
     }
 
-    static Double getMinimalCostFrom(Location start, Location dest) {
+    Double getMinimalCostFrom(Location start, Location dest) {
         SearchProblem p = GraphSearchProblem
                 .startingFrom(start)
                 .goalAt(dest)

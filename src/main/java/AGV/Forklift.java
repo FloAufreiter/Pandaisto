@@ -14,9 +14,9 @@ class Forklift implements Runnable {
 
     private int id = IDS++;
 
-    private static int FORKHEIGHT_1 = 1;
+    private static int FORK_HEIGHT_1 = 1;
 
-    private static int FORKHEIGHT_2 = 2;
+    private static int FORK_HEIGHT_2 = 2;
 
     private Status status = Status.AVAILABLE;
 
@@ -54,11 +54,11 @@ class Forklift implements Runnable {
 
     @Override
     public void run() {
-        AGV.updateGui(this);
+        AGV.getInstance().updateGui(this);
         executeRoute(loadingRoute);
         executeRoute(unloadingRoute);
         status = Status.AVAILABLE;
-        AGV.updateGui(this);
+        AGV.getInstance().updateGui(this);
     }
 
     private void executeRoute(Route route) {
@@ -71,12 +71,10 @@ class Forklift implements Runnable {
 	                case unprocessed:
 	                    loadCommodity(t.getItemType(), nearest);
 	                    t.switchState();
-	                    //System.out.println("done loading" +t.getId());
 	                    break;
 	                case loaded:
 	                    unloadCommodity(t.getItemType(), nearest);
 	                    t.switchState();
-	                   // System.out.println("done unloading" + t.getId());
 	                    break;
 	                case finished:
 	                    break;
@@ -84,7 +82,7 @@ class Forklift implements Runnable {
             }
             route.getStops().remove(nearest);
             currentLocation = nearest;
-            AGV.updateGui(this);
+            AGV.getInstance().updateGui(this);
         }
     }
 
@@ -95,7 +93,7 @@ class Forklift implements Runnable {
             System.out.println("in getNearest Function:");
             System.out.println(this.getCurrentLocation());
             System.out.println(l);
-            Double d = Area.getMinimalCostFrom(this.getCurrentLocation(), l);
+            Double d = Area.getInstance().getMinimalCostFrom(this.getCurrentLocation(), l);
             System.out.println("mincost: " + d);
             if (d < min_cost) {
                 min_cost = d;
@@ -110,7 +108,7 @@ class Forklift implements Runnable {
     }
 
     private void driveToLocation(Location location) {
-        Double d = Area.getMinimalCostFrom(this.getCurrentLocation(), location);
+        Double d = Area.getInstance().getMinimalCostFrom(this.getCurrentLocation(), location);
         try {
             Thread.sleep(Math.round(d * 800));
         } catch (InterruptedException e) {
@@ -135,18 +133,18 @@ class Forklift implements Runnable {
                     break;
                 case TOP_SHELF1:
                 	//System.out.println(Thread.currentThread().getId() + " loading topshelf1");
-                    setForkHeight(FORKHEIGHT_1);
+                    setForkHeight(FORK_HEIGHT_1);
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
                 case TOP_SHELF2:
                 	//System.out.println(Thread.currentThread().getId() + " loading topshelf2");
-                    setForkHeight(FORKHEIGHT_2);
+                    setForkHeight(FORK_HEIGHT_2);
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
                 case PRODUCTION_LINE:
                     RobotScheduler.get(location.getId()).removeElement();
             }
-            Thread.sleep(100); //TODO: changed for faster testing!
+            Thread.sleep(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -155,17 +153,17 @@ class Forklift implements Runnable {
     private void unloadCommodity(ItemType it, Location location) {
         try {
         	System.out.println(Thread.currentThread().getId() + " unloading");
-            Thread.sleep(400); //TODO cahnged for faster testing
+            Thread.sleep(2000); //TODO cahnged for faster testing
             switch(location.getType()) {
                 case FLOOR_SHELF:
                     AGVInterface.confirmItemAdded(location.getId(), it);
                     break;
                 case TOP_SHELF1:
-                    setForkHeight(FORKHEIGHT_1);
+                    setForkHeight(FORK_HEIGHT_1);
                     AGVInterface.confirmItemAdded(location.getId(), it);
                     break;
                 case TOP_SHELF2:
-                    setForkHeight(FORKHEIGHT_2);
+                    setForkHeight(FORK_HEIGHT_2);
                     AGVInterface.confirmItemAdded(location.getId(), it);
                     break;
                 case PRODUCTION_LINE:

@@ -9,7 +9,6 @@ public class AGV {
     private static TaskScheduler scheduler;
 
     private static Thread schedulerThread;
-    private static Area area;
     static private DefaultTableModel model;
     static private JTable table;
 
@@ -20,7 +19,6 @@ public class AGV {
     private static final AGV instance = new AGV();
 
     private AGV() {
-        this.area = new Area();
         this.scheduler = new TaskScheduler();
     }
 
@@ -60,8 +58,11 @@ public class AGV {
         frame.setVisible(true);
     }
 
+    public Thread getSchedulerThread() {
+        return schedulerThread;
+    }
 
-    static void updateGui(Forklift f) {
+    void updateGui(Forklift f) {
         model.setValueAt(f.getStatus() ,f.getId(),1);
         model.setValueAt(f.getCurrentLocation() ,f.getId(),2);
         table.repaint();
