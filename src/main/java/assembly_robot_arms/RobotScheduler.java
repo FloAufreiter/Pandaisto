@@ -20,7 +20,7 @@ public class RobotScheduler {
 			INSTANCE = new RobotScheduler(bcs);
 			
 		}
-			return INSTANCE;
+		return INSTANCE;
 	}
 
 	public static Arm get(int id) {

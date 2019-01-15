@@ -11,34 +11,22 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestWarehouse {
 
 	@Before
 	public void initDB() throws SQLException {
-		try {
-			Database.getInstance().initTestDB();
-		} catch (SQLException e) {
-			try {
-				Database.getInstance().deleteTestDB();
-				Database.getInstance().initTestDB();
-			} catch (SQLException e1) {
-				throw e1;
-			}
-		}
+		TestUtils.initDB();
 	}
 
 	@After
 	public void deleteDB() {
-		try {
-			Database.getInstance().deleteTestDB();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		TestUtils.deleteDB();
 	}
-	
+
 	@Test 
-	public void testInitDB() throws SQLException, InterruptedException {
+	public void testInitDB() throws SQLException {
 		Database db = Database.getInstance();
 		assertEquals(5, db.itemsInStock(ItemType.BLUE_PAINT));
 	}
@@ -102,9 +90,9 @@ public class TestWarehouse {
 	}
     
     @Test 
-    public void testBackup() throws InterruptedException {
+    public void testBackup() {
     	boolean fileExists = Files.exists(Paths.get("./DBBACKUP")); //backup should already have been done at startup
-    	assertEquals(true, fileExists);
+		assertTrue(fileExists);
     }
     
     @Test

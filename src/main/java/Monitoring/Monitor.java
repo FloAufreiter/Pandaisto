@@ -98,24 +98,24 @@ public class Monitor implements Runnable {
 				if(warehouse.itemsInStock(oldestOngoingOrder.getContainer().getItemType()) >= oldestOngoingOrder.getContainer().getAmount()){
 					int shelfId = warehouse.itemByType(oldestOngoingOrder.getContainer().getItemType().toString());
 					warehouse.deleteItem(shelfId);
-					
+
 					oldestOngoingOrder.setDone(true);
 					System.out.println("ORDER DONE!");
-					
+
 				}
 				else {
 					System.out.println("NOT ENOUGH PRODUCED CARS: " + warehouse.itemsInStock(oldestOngoingOrder.getContainer().getItemType()) + " " + oldestOngoingOrder.getContainer().getItemType().toString());
 				}
-			
+
     		}
     }
 
     public void createCustomerOrder(int amount, ItemType itemType, Customer customer) {
-    	
+
     		// start production (if it isn't already running)
         rob.startRobotArms();
-                       
-        if(onlineStore.checkAvailability(100, itemType) <= 5) {       		
+
+        if(onlineStore.checkAvailability(100, itemType) <= 5) {
         		int shelfId = -1;
 				shelfId = warehouse.itemByType(itemType.toString());
 				

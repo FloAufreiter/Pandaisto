@@ -8,9 +8,9 @@ import java.util.concurrent.*;
 
 public class TaskScheduler implements Runnable {
 
-    ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private ExecutorService executorService = Executors.newFixedThreadPool(10);
     
-    public void stopScheduler() {
+    void stopScheduler() {
         STOP_AGV = true;
     }
 
@@ -48,6 +48,7 @@ public class TaskScheduler implements Runnable {
                         nearest_free = f;
                     }
                 }
+                assert nearest_free != null;
                 nearest_free.addTask(t);
                 nearest_free.setStatus(Forklift.Status.IN_USE);
                 if (nearest_free.isFullyLoaded()) {
@@ -101,7 +102,7 @@ public class TaskScheduler implements Runnable {
         }
         executorService.shutdown();
         try {
-            executorService.awaitTermination(1, TimeUnit.DAYS);
+            executorService.awaitTermination(1, TimeUnit.MINUTES);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

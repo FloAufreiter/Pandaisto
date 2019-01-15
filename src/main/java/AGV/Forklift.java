@@ -6,7 +6,7 @@ import warehouse.AGVInterface;
 
 class Forklift implements Runnable {
 
-    static int IDS;
+    private static int IDS;
 
     public int getId() {
         return id;
@@ -33,7 +33,7 @@ class Forklift implements Runnable {
         return currentLocation;
     }
 
-    private Location currentLocation = Area.getRandomLocation();
+    private Location currentLocation = Area.getInstance().getRandomLocation();
 
     private Route loadingRoute = new Route();
     private Route unloadingRoute = new Route();
@@ -69,7 +69,7 @@ class Forklift implements Runnable {
             for(Task t: tasks) {
 	            switch (t.getCurrentState()) {
 	                case unprocessed:
-	                    loadCommodity(t.getItemType(), nearest);
+	                    loadCommodity(nearest);
 	                    t.switchState();
 	                    break;
 	                case loaded:
@@ -90,11 +90,7 @@ class Forklift implements Runnable {
         Location nearest = null;
         double min_cost = Double.MAX_VALUE;
         for (Location l : route.getStops().keySet()) {
-            System.out.println("in getNearest Function:");
-            System.out.println(this.getCurrentLocation());
-            System.out.println(l);
             Double d = Area.getInstance().getMinimalCostFrom(this.getCurrentLocation(), l);
-            System.out.println("mincost: " + d);
             if (d < min_cost) {
                 min_cost = d;
                 nearest = l;
@@ -124,20 +120,18 @@ class Forklift implements Runnable {
         }
     }
 
-    private void loadCommodity(ItemType it, Location location) {
+    private void loadCommodity(Location location) {
+        System.out.println("Forklift " + this.getId() + " loading");
         try {
             switch (location.getType()) {
                 case FLOOR_SHELF:
-                	//System.out.println(Thread.currentThread().getId() + " loading floorshelf");
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
                 case TOP_SHELF1:
-                	//System.out.println(Thread.currentThread().getId() + " loading topshelf1");
                     setForkHeight(FORK_HEIGHT_1);
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
                 case TOP_SHELF2:
-                	//System.out.println(Thread.currentThread().getId() + " loading topshelf2");
                     setForkHeight(FORK_HEIGHT_2);
                     AGVInterface.confirmItemRemoval(location.getId());
                     break;
@@ -152,8 +146,8 @@ class Forklift implements Runnable {
 
     private void unloadCommodity(ItemType it, Location location) {
         try {
-        	System.out.println(Thread.currentThread().getId() + " unloading");
-            Thread.sleep(2000); //TODO cahnged for faster testing
+            System.out.println("Forklift " + this.getId() + " unloading");
+            Thread.sleep(2000);
             switch(location.getType()) {
                 case FLOOR_SHELF:
                     AGVInterface.confirmItemAdded(location.getId(), it);
@@ -179,7 +173,7 @@ class Forklift implements Runnable {
         unloadingRoute.addLocation(t.getLocationB(), t);
     }
     
-    public void setStatus(Status s) {
+    void setStatus(Status s) {
     	this.status = s;
     }
 }

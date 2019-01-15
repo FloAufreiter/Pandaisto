@@ -43,7 +43,7 @@ public class Area {
 
     }
 
-    public static Location getRandomLocation() {
+    public Location getRandomLocation() {
         Object[] locations = Stream.concat(DOCKS.values().stream(), Stream.concat(ROBOT_ARMS.values().stream(), SHELVES.values().stream())).toArray();
         Random random = new Random();
         return (Location) locations[random.nextInt(locations.length)];
@@ -55,7 +55,6 @@ public class Area {
         //shelves
         Location prev = null;
         for (int i = 0; i < 60; i++) {
-            System.out.println(i);
             //floor shelves
             Location fs = new Location(Location.LocationType.FLOOR_SHELF, i);
             if (prev != null) {
@@ -65,13 +64,11 @@ public class Area {
             prev = fs;
             //first floor shelves
             int ts1_id = ++i;
-            System.out.println(ts1_id);
             Location ts1 = new Location(Location.LocationType.TOP_SHELF1, ts1_id);
             gb.connect(fs).to(ts1).withEdge(0d);
             SHELVES.put(ts1_id, ts1);
             //second floor shelves
             int ts2_id = ++i;
-            System.out.println(ts2_id);
             Location ts2 = new Location(Location.LocationType.TOP_SHELF2, ts2_id);
             gb.connect(ts1).to(ts2).withEdge(0d);
             SHELVES.put(ts2_id, ts2);
