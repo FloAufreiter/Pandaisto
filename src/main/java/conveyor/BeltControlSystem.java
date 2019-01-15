@@ -28,7 +28,7 @@ public class BeltControlSystem implements Runnable{
 		beltStart[1] = curr;
 		
 		
-		ConveyorGUI.openGUI(beltStart, lubController);
+		ConveyorGUI.openGUI(beltStart,lubController);
 	}
 	public static BeltControlSystem getInstance(float minLubPressure, float maxConveyorSpeed) {
 		if(bcs == null) {
@@ -75,7 +75,7 @@ public class BeltControlSystem implements Runnable{
 	}
 	public boolean addItemAt(int beltID, ItemType item) {
 		synchronized(this) {
-			return getBeltSegment(beltID).addItem(item); //this will change a bit when the ItemType is added
+			return getBeltSegment(beltID).addItem(item); 
 		}
 	}
 	
@@ -136,5 +136,9 @@ public class BeltControlSystem implements Runnable{
 	}
 	public ItemType getItemTypeAt(int beltId) {
 		return getBeltSegment(beltId).getItemType();
+	}
+	public boolean hasLubError() {
+		
+		return lubController.getErrorStatus();
 	}
 }

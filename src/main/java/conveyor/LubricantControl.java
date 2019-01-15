@@ -48,4 +48,8 @@ public class LubricantControl {
 	public float getMinPressureLevel() {
 		return minPressure;
 	}
+	//returns true when lubricant level is to low
+	public boolean getErrorStatus() {
+		return averagePressure < minPressure;
+	}
 }

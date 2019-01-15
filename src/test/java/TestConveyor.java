@@ -49,13 +49,8 @@ public class TestConveyor {
 		
 		bcs.addItemAt(16, ItemType.WHEEL);
 		
-		for(int i = 0; i < 5; i++) {
-			bcs.moveAllBeltsForward();
-		}
-		
-		bcs.removeItemAt(13);
-		assert(false);
-		
+		bcs.removeItemAt(16);
+		assert(bcs.isEmpty(16));
 	}
 	
 }
