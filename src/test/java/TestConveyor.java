@@ -50,10 +50,7 @@ public class TestConveyor {
 		bcs.addItemAt(16, ItemType.WHEEL);
 		
 		bcs.removeItemAt(16);
-		assert(!bcs.isEmpty(16));
+		assert(bcs.isEmpty(16));
 	}
-	
-//	@Test
-//	public void 
 	
 }

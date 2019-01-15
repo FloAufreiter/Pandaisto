@@ -10,7 +10,7 @@ public class LubricantSensor {
 	}
 	//returns true when the lubricant pressure is below the minPressure.
 	public boolean senseLubricantPressure() {
-		lastReading -= Math.random()/100;
+		lastReading -= Math.random()/10;
 		return (lastReading < minPressure);
 	}
 	

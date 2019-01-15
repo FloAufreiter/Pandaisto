@@ -9,8 +9,9 @@ import java.awt.Graphics;
 public class ConveyorGUI {
 	private static JFrame frame;
 	private static JTextField currPressureText;
+	private static LubricantControl lubControl;
 	
-	public static void openGUI(BeltSegment[] firstBelt, LubricantControl lc) {
+	public static void openGUI(BeltSegment[] firstBelt,LubricantControl lc) {
 		frame = new JFrame("Conveyor GUI");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1000,1000);
@@ -50,10 +51,11 @@ public class ConveyorGUI {
 		frame.add(beltPanel);
 		frame.pack();
 		frame.setVisible(true);
+		lubControl = lc;
 	}
 	
 	public static void updateGUI() {
-		
+		currPressureText.setText("Current: " + Float.toString(lubControl.getCurrentLubricantLevel()));
 		frame.repaint();
 	}
 }
