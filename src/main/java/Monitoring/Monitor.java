@@ -139,7 +139,7 @@ public class Monitor implements Runnable {
                         System.out.println(shelfLoc);
                         System.out.println(st.getType());
                         System.out.println(st.getId());
-                    }
+            		}       
                 }
             }
         }

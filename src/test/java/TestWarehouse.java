@@ -1,20 +1,45 @@
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import shared.ItemType;
+import warehouse.BackupManager;
 import warehouse.Database;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertEquals;
 
 public class TestWarehouse {
 
+	@Before
+	public void initDB() throws SQLException {
+		try {
+			Database.getInstance().initTestDB();
+		} catch (SQLException e) {
+			try {
+				Database.getInstance().deleteTestDB();
+				Database.getInstance().initTestDB();
+			} catch (SQLException e1) {
+				throw e1;
+			}
+		}
+	}
 
+	@After
+	public void deleteDB() {
+		try {
+			Database.getInstance().deleteTestDB();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@Test 
 	public void testInitDB() throws SQLException, InterruptedException {
 		Database db = Database.getInstance();
-		db.initTestDB();
 		assertEquals(5, db.itemsInStock(ItemType.BLUE_PAINT));
-		db.deleteTestDB();
 	}
 	
 
@@ -32,9 +57,9 @@ public class TestWarehouse {
         Database.getInstance().insertItem(50002, ItemType.CAR_BODY);
         Database.getInstance().insertItem(50003, ItemType.CAR_BODY);
         Database.getInstance().insertItem(50004, ItemType.CAR_BODY);
-        assertEquals(5, Database.getInstance().itemsInStock(ItemType.CAR_BODY));
-        Database.getInstance().deleteItem(50000);
-        assertEquals(4, Database.getInstance().itemsInStock(ItemType.CAR_BODY));
+
+        assertEquals(5, Database.getInstance().itemsInWarehouse(4));
+
         Database.getInstance().deleteWarehouse(4);
     }
     
@@ -42,6 +67,8 @@ public class TestWarehouse {
     @Test
     public void testItemNotRemovedTwice() throws SQLException {
     	Database db = Database.getInstance();
+    	db.deleteWarehouse(10);
+    	db.deleteTestDB(); // warehouse needs to be empty for test to work
     	db.insertWarehouse(10, 100);
     	db.insertShelf(1000, 10, 1);
     	db.insertItem(1000, ItemType.BLUE_PAINT);
@@ -53,24 +80,29 @@ public class TestWarehouse {
     }
 
     @Test
-    public void checkShelf11() throws SQLException {
+    public void checkShelfTest() throws SQLException {
     	Database db = Database.getInstance();
-    	db.initTestDB();
     	db.deleteItem(11);
     	assertEquals(4, db.itemsInStock(ItemType.CAR_BODY));
-    	db.deleteTestDB();
     }
 
     @Test
-	public void checkItemStock() throws SQLException {
+	public void checkItemStockTest() throws SQLException {
 		Database db = Database.getInstance();
+		db.deleteWarehouse(10); //delete in case left over from other test or created by someone else
 		db.insertWarehouse(10, 100);
 		for(int i = 0; i < 100; i ++) db.insertShelf(i+1000, 10, 0);
 		for(int i = 0; i < 100; i++) db.insertItem(i+1000, ItemType.RED_PAINT);
-		assertEquals(100, db.itemsInStock(ItemType.RED_PAINT));
-		db.deleteItem(1000);
-		assertEquals(99, db.itemsInStock(ItemType.RED_PAINT));
+		assertEquals(100, db.itemsInWarehouse(10));
+		if(! db.deleteItem(1005)) throw new SQLException();
+		assertEquals(99, db.itemsInWarehouse(10));
 		db.deleteWarehouse(10);
-		assertEquals(0, db.itemsInStock(ItemType.RED_PAINT));
+		assertEquals(0, db.itemsInWarehouse(10));
 	}
+    
+    @Test 
+    public void testBackup() throws InterruptedException {
+    	boolean fileExists = Files.exists(Paths.get("./DBBACKUP")); //backup should already have been done at startup
+    	assertEquals(true, fileExists);
+    }
 }

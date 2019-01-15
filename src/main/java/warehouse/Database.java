@@ -62,11 +62,13 @@ public class Database {
     private final PreparedStatement idByItemTypeStmt;
     private final PreparedStatement itemStockStmt;
     private final PreparedStatement getLevelStmt;
+    private final PreparedStatement itemStockWHStmt;
 
     //keep track of what id'S have been already been given out
     private final HashSet<Integer> itemsToBeRemoved = new HashSet<>();
     private final HashSet<Integer> shelvesToBeFilled = new HashSet<>();
 
+    boolean dbLocked;
     //list of listeners that act on changes to database
     private final ArrayList<DBListener> listeners;
     PathOrganizer p;
@@ -99,14 +101,15 @@ public class Database {
         itemByIDStmt = conn.prepareStatement("select type from shelves where shelfID=?");
         idByItemTypeStmt = conn.prepareStatement("select shelfID from shelves where type=?");
         itemStockStmt = conn.prepareStatement("Select count(*) as cnt from shelves where type=?");
+        itemStockWHStmt = conn.prepareStatement("Select count(*) as cnt from shelves where warehouseID=? and type is not null");
         getLevelStmt = conn.prepareStatement("Select level from shelves where shelfID=?");
-
+        
+        
         listeners = new ArrayList<>();
-        p = new PathOrganizer();
-        this.addListener(p);
         this.addListener(new StockManager());
-        //new BackupManager(1, System.getProperty("user.dir"), "/home//tom/eclipse-workspace/sweng").start();
-
+        dbLocked = false;
+        new Thread(new BackupManager(1)).start(); //create backupmanager that makes backup every day
+        
     }
 
     /**
@@ -314,6 +317,22 @@ public class Database {
             return i;
         }
     }
+    
+    /**
+     * Method to get number of items in specific warehouse
+     * @param warehouseID - id of warehouse to query
+     * @return
+     * @throws SQLException
+     */
+    public int itemsInWarehouse(int warehouseID) throws SQLException {
+    	synchronized (itemStockWHStmt) {
+            itemStockWHStmt.setInt(1, warehouseID);
+            ResultSet res = itemStockWHStmt.executeQuery();
+            int i = 0;
+            if (res.next()) i = res.getInt("cnt");
+            return i;
+        }
+    }
 
     private static void createTables(Connection conn) {
         String createWarehouseTable = "create table Warehouses (warehouseID integer primary key not Null," +
@@ -334,22 +353,23 @@ public class Database {
     }
 
     public void initTestDB() throws SQLException {
-        Database db = this;
-        db.insertWarehouse(0, 1000);
-        for (int i = 0; i < 60; ) {
-            db.insertShelf(i++, 0, 0); //Floor shelves
-            db.insertShelf(i++, 0, 1); //middle shelves
-            db.insertShelf(i++, 0, 2); //top shelf
-        }
-        int n = 5;
-        for (int i = 0; i < n; i++) {
-            db.insertItem(i, ItemType.SCREW);
-            db.insertItem(i + n, ItemType.BLUE_PAINT);
-            db.insertItem(i + n * 2, ItemType.CAR_BODY);
-            db.insertItem(i + n * 3, ItemType.RED_PAINT);
-            db.insertItem(i + n * 4, ItemType.REMOTE);
-            db.insertItem(i + n * 5, ItemType.WHEEL);
-        }
+    	Database db = this;
+    	db.insertWarehouse(0, 1000);
+		for(int i = 0; i < 60;) {
+			db.insertShelf(i++, 0, 0); //Floor shelves
+			db.insertShelf(i++, 0, 1); // middle shelves
+			db.insertShelf(i++, 0, 2); //top shelf
+		}
+		System.out.println();
+		int n = 5;
+		for(int i = 0; i < n; i++) {
+			db.insertItem(i, ItemType.SCREW);
+			db.insertItem(i+n, ItemType.BLUE_PAINT);
+			db.insertItem(i+n*2, ItemType.CAR_BODY);
+			db.insertItem(i+n*3, ItemType.RED_PAINT);
+			db.insertItem(i+n*4, ItemType.REMOTE);
+			db.insertItem(i+n*5, ItemType.WHEEL);
+		}
     }
 
     public void deleteTestDB() throws SQLException {
@@ -415,6 +435,19 @@ public class Database {
         return null;
     }
 
+    void lockDB() {
+    	dbLocked = true;
+    }
+    
+    void unLockDB() {
+    	dbLocked = false;
+    }
+    
+    boolean isLocked() { return dbLocked;};
+    /**
+     * Utility function for writing status messages to stdout
+     * @param msg - Message to be printed
+     */
     static void warehousePrint(String msg) {
         System.out.println("\n------WAREHOUSE MESSAGE BEGIN------\n" + msg + "\n------WAREHOUSE MESSAGE END------\n");
     }

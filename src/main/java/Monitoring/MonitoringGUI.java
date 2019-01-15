@@ -46,8 +46,12 @@ public class MonitoringGUI {
 		try {
 			Database.getInstance().initTestDB();
 		} catch (SQLException e1) {
-			e1.printStackTrace();
-			System.exit(-1); //SHIT
+			try {
+				Database.getInstance().deleteTestDB();
+				Database.getInstance().initTestDB();
+			} catch (SQLException e) {
+				System.exit(-1); //can't setup database
+			}
 		}
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {

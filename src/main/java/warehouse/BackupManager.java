@@ -2,7 +2,9 @@ package warehouse;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Class for handling automatic backups
@@ -20,25 +22,30 @@ public class BackupManager extends Thread {
 	/**
 	 * Public constructor
 	 */
-	public BackupManager(int backupInterval, String srcPath, String destPath) {
+	BackupManager(int backupInterval, String srcPath, String destPath) {
 		lastBackup = new Date();
 		this.backupInterval = backupInterval;
 		interrupted = false;
 		this.backup = new File(destPath);
+		this.backup.mkdir();
 		this.DB = new File(srcPath);
+	}
+	
+	public BackupManager(int backupInterval) {
+		this(backupInterval, System.getProperty("user.dir") + "/warehouseDB", System.getProperty("user.dir")+"/DBBACKUP");
 	}
 	
 	@Override
 	public void run() {
 		try {
-			try {
-				System.out.println("blah");
+			try { //first time this is opened make backup of db
 				copyDB();
-				System.out.println("bluh");
 			} catch(IOException e) {
 				e.printStackTrace();
+			} finally {
+				
 			}
-
+			
 			while(! interrupted) {
 			Thread.sleep(backupInterval * 24 * 60 * 60 * 100); //suspend thread until next backup
 			
@@ -56,19 +63,39 @@ public class BackupManager extends Thread {
 		
 	}
 	
+	/**
+	 * Simple copy of all contents of DB
+	 * @throws IOException
+	 */
 	private void copyDB() throws IOException {
-		//FileUtils.copyDirectory(DB, backup);
-//		try(Stream<Path> stream = Files.walk(DB.toPath())) {
-//			stream.forEach(sourcePath -> {
-//				try {
-//					Files.copy(sourcePath, DB.toPath().resolve(backup.toPath().relativize(sourcePath)));
-//					System.out.println(sourcePath);
-//				} catch(Exception e) {
-//					e.printStackTrace();
-//				}
-//			});
-//		}
-		
-		
+		Database.warehousePrint("CREATING BACKUP");
+		try {
+			Database.getInstance().lockDB();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				Database.getInstance().unLockDB();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		FileUtils.copyDirectory(DB, backup);
+		try {
+			Database.getInstance().unLockDB();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				Database.getInstance().unLockDB();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		Database.warehousePrint("BACKUP DONE");
 	}
 }
