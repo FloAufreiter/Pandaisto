@@ -9,6 +9,8 @@ public class ComponentOrder {
 	
 	ItemContainer container;
 	
+	
+	
 	public ComponentOrder(int amount, ItemType itemType, Supplier supplier) {
 		
 		this.container = new ItemContainer(amount, itemType);

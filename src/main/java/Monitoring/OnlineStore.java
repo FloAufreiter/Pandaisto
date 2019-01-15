@@ -9,7 +9,7 @@ public class OnlineStore {
 
     ArrayList<ItemType> soritment = new ArrayList<ItemType>();
 
-    private static ArrayList<CustomerOrder> ONGOING_ORDERS = new ArrayList<CustomerOrder>();
+    private static ArrayList<CustomerOrder> ORDERS = new ArrayList<CustomerOrder>();
 
     private static OnlineStore onlineStore = new OnlineStore();
 
@@ -40,17 +40,31 @@ public class OnlineStore {
         }
     }
 
-    public void createCustomerOrder(int amount, ItemType itemType, Customer customer) {
+    public void createCustomerOrder(int amount, ItemType itemType, Customer customer, boolean done) {
 
-        if (!Customer.customers.contains(customer)) {
-            Customer.customers.add(customer);
+        if (!Customer.getCustomers().contains(customer)) {
+            Customer.getCustomers().add(customer);
         }
 
-        ONGOING_ORDERS.add(new CustomerOrder(amount, itemType, customer));
+        ORDERS.add(new CustomerOrder(amount, itemType, customer, done));
     }
 
     public int getNumberOfOngoingComponentsOrders() {
-        return ONGOING_ORDERS.size();
+        return ORDERS.size();
+    }
+    
+    public ArrayList<CustomerOrder> getCustomerOrders() {
+        return (ArrayList<CustomerOrder>) ORDERS.clone();
+    }
+    
+    public CustomerOrder getOldestOngoingOrders() {
+    		for(CustomerOrder order : ORDERS) {
+    			if(!order.getDone()) {
+    				return  order;
+    			}
+    		}
+    		
+    		return null;
     }
 
 

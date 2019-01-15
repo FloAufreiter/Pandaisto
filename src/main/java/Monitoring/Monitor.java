@@ -30,6 +30,26 @@ public class Monitor implements Runnable {
     private static RobotScheduler rob;
 
     private boolean STOP = true;
+    
+    public OnlineStore getOnlineStore() {
+    		return onlineStore;
+    }
+    
+    public Database getWarehouse() {
+		return warehouse;
+    }
+    
+    public AGV getAGV() {
+		return agv;
+    }
+    
+    public RobotScheduler getRobotScheduler() {
+		return rob;
+    }
+    
+    public ArrayList<ComponentOrder> getComponentsOrders() {
+        return (ArrayList<ComponentOrder>) ONGOING_ORDERS.clone();
+    }
 
     private void createComponentOrder(int amount, ItemType itemType) {
 
@@ -68,10 +88,56 @@ public class Monitor implements Runnable {
         ONGOING_ORDERS.add(new ComponentOrder(amount, itemType, supplier));
         orderComponents();
     }
+    
+    public void checkOngoingOrders() {
+    	
+    		System.out.println("CHECK ONGOING ORDERS");
+    		CustomerOrder oldestOngoingOrder = onlineStore.getOldestOngoingOrders();
+    		
+    			try {
+				if(warehouse.itemsInStock(oldestOngoingOrder.getContainer().getItemType()) >= oldestOngoingOrder.getContainer().getAmount()){
+					int shelfId = warehouse.itemByType(oldestOngoingOrder.getContainer().getItemType().toString());
+					warehouse.deleteItem(shelfId);
+					
+					oldestOngoingOrder.setDone(true);
+					System.out.println("ORDER DONE!");
+					
+				}
+				else {
+					System.out.println("NOT ENOUGH PRODUCED CARS: " + warehouse.itemsInStock(oldestOngoingOrder.getContainer().getItemType()) + " " + oldestOngoingOrder.getContainer().getItemType().toString());
+				}
+			} catch (SQLException e) {
+				return;
+				
+			};   		
+    }
 
     public void createCustomerOrder(int amount, ItemType itemType, Customer customer) {
+    	
+    		// start production (if it isn't already running)
         rob.startRobotArms();
-        onlineStore.createCustomerOrder(amount, itemType, customer);
+                       
+        if(onlineStore.checkAvailability(100, itemType) <= 5) {       		
+        		int shelfId = -1;
+				try {
+					shelfId = warehouse.itemByType(itemType.toString());
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				
+        		if(shelfId == -1) {
+        			// wait
+        			onlineStore.createCustomerOrder(amount, itemType, customer, false);
+        		}
+        		else {
+        			onlineStore.createCustomerOrder(amount, itemType, customer, true);
+        			warehouse.deleteItem(shelfId);
+        		}
+        }
+        
+        else {
+        		onlineStore.createCustomerOrder(amount, itemType, customer, false);
+        }
     }
 
     private Monitor() {
@@ -177,6 +243,8 @@ public class Monitor implements Runnable {
                 task_created = false;
             }
         }
+        
+        checkOngoingOrders();
     }
 
 
@@ -190,6 +258,10 @@ public class Monitor implements Runnable {
 
     public int getNumberOfOngoingCustomerOrders() {
         return onlineStore.getNumberOfOngoingComponentsOrders();
+    }
+    
+    public ArrayList<CustomerOrder> getCustomerOrders(){
+    		return onlineStore.getCustomerOrders();
     }
 
     @Override
