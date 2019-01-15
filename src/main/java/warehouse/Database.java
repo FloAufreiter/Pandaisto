@@ -3,6 +3,7 @@ package warehouse;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import AGV.Location;
 import shared.ItemType;
@@ -69,11 +70,8 @@ public class Database {
     private final HashSet<Integer> itemsToBeRemoved = new HashSet<>();
     private final HashSet<Integer> shelvesToBeFilled = new HashSet<>();
 
-    boolean dbLocked;
     //list of listeners that act on changes to database
-    private final ArrayList<DBListener> listeners;
-    PathOrganizer p;
-
+    private final ArrayBlockingQueue<DBListener> listeners;
     /**
      * Private Constructor
      *
@@ -106,10 +104,9 @@ public class Database {
         getLevelStmt = conn.prepareStatement("Select level from shelves where shelfID=?");
         getItemAtStmt = conn.prepareStatement("Select type from shelves where shelfID=?");
         
-        listeners = new ArrayList<>();
+        listeners = new ArrayBlockingQueue<DBListener>(3);
         this.addListener(new StockManager());
-        dbLocked = false;
-        new Thread(new BackupManager(1)).start(); //create backupmanager that makes backup every day
+        new BackupManager(1).start(); //create backupmanager that makes backup every day
         
     }
 
@@ -128,7 +125,12 @@ public class Database {
         }
     }
 
-    public ItemType getItemAt(int shelfID) {
+    /**
+     * Get item at shelf location
+     * @param shelfID
+     * @return ItemType of item at shelf with id shelfID or null if no item was there
+     */
+    ItemType getItemAt(int shelfID) {
     	synchronized (getItemAtStmt) {
             try {
                 getItemAtStmt.setInt(1, shelfID);
@@ -186,7 +188,12 @@ public class Database {
             return true;
         }
     }
-
+    
+    /**
+     * Get height of shelf in warehouse
+     * @param shelfID
+     * @return LocationType of the shelf
+     */
     public Location.LocationType getLevel(int shelfID) {
         synchronized (getLevelStmt) {
             try {
@@ -205,6 +212,11 @@ public class Database {
         }
     }
 
+    /**
+     * Utility function to transform a level (0, 1 or 2) in database to Location
+     * @param level
+     * @return
+     */
     private Location.LocationType levelToLoc(int level) {
         switch (level) {
             case 0:
@@ -223,7 +235,7 @@ public class Database {
      * @param shelfID
      * @return
      */
-    public boolean deleteShelf(int shelfID) {
+    boolean deleteShelf(int shelfID) {
         synchronized (deleteShelfStmt) {
             try {
                 deleteShelfStmt.setInt(1, shelfID);
@@ -237,10 +249,8 @@ public class Database {
 
     /**
      * insert item into some existing shelfspace
-     * TODO: Organizer classes will handle arrangement of items in efficient way
-     *
-     * @param type
-     * @return
+     * @param type - ItemType to be added
+     * @return boolean indicating wheter adding succeeded
      */
     public boolean insertItem(int shelfID, ItemType type) {
         synchronized (insertItemStmt) {
@@ -262,16 +272,15 @@ public class Database {
     /**
      * Method for registering listeners to database changes
      *
-     * @param l
+     * @param l - DBListener to add
      */
-    public void addListener(DBListener l) {
-        listeners.add(l);
+    void addListener(DBListener l) {
+		listeners.add(l);
     }
 
     /**
      * Method for deleting item from warehouse
-     *
-     * @return
+     * @return - boolean indicating if deletion was successful
      */
     public boolean deleteItem(int shelfID) {
         synchronized (deleteItemStmt) {
@@ -305,19 +314,23 @@ public class Database {
      * @return id of shelfplace if successful, -1 otherwise
      * @throws SQLException
      */
-    public int itemByType(String type) throws SQLException {
+    public int itemByType(String type) {
         synchronized (idByItemTypeStmt) {
-            idByItemTypeStmt.setString(1, type);
-            ResultSet res = idByItemTypeStmt.executeQuery();
-            int ret = -1;
-            while (res.next()) {
-                ret = res.getInt("shelfid");
-                if (!itemsToBeRemoved.contains(ret)) {
-                    itemsToBeRemoved.add(ret); //items are always queried before removal
-                    return ret; //only items that haven't been queried get removed
-                }
-            }
-            return -1;
+        	try {
+	            idByItemTypeStmt.setString(1, type);
+	            ResultSet res = idByItemTypeStmt.executeQuery();
+	            int ret = -1;
+	            while (res.next()) {
+	                ret = res.getInt("shelfid");
+	                if (!itemsToBeRemoved.contains(ret)) {
+	                    itemsToBeRemoved.add(ret); //items are always queried before removal
+	                    return ret; //only items that haven't been queried get removed
+	                }
+	            }
+	            return ret;
+        	}catch (SQLException e) {
+        		return -1;
+        	}
         }
     }
 
@@ -325,35 +338,46 @@ public class Database {
      * Method to get number of items in warehouse that are of type type
      *
      * @param type - type of item to count
-     * @return the number of items in stock of this particular item type
-     * @throws SQLException
+     * @return the number of items in stock of this particular item type, -1 if error
      */
-    public int itemsInStock(ItemType type) throws SQLException {
+    public int itemsInStock(ItemType type) {
         synchronized (itemStockStmt) {
-            itemStockStmt.setString(1, type.toString());
-            ResultSet res = itemStockStmt.executeQuery();
-            int i = 0;
-            if (res.next()) i = res.getInt("cnt");
-            return i;
+            try {
+				itemStockStmt.setString(1, type.toString());
+	            ResultSet res = itemStockStmt.executeQuery();
+	            int i = 0;
+	            if (res.next()) i = res.getInt("cnt");
+	            return i;
+			} catch (SQLException e) {
+				return -1;
+			}
         }
     }
     
     /**
      * Method to get number of items in specific warehouse
      * @param warehouseID - id of warehouse to query
-     * @return
+     * @return number of items in given warehouse, -1 if error occured
      * @throws SQLException
      */
-    public int itemsInWarehouse(int warehouseID) throws SQLException {
+    public int itemsInWarehouse(int warehouseID) {
     	synchronized (itemStockWHStmt) {
-            itemStockWHStmt.setInt(1, warehouseID);
-            ResultSet res = itemStockWHStmt.executeQuery();
-            int i = 0;
-            if (res.next()) i = res.getInt("cnt");
-            return i;
+            try {
+				itemStockWHStmt.setInt(1, warehouseID);
+	            ResultSet res = itemStockWHStmt.executeQuery();
+	            int i = 0;
+	            if (res.next()) i = res.getInt("cnt");
+	            return i;
+			} catch (SQLException e) {
+				return -1;
+			}
         }
     }
 
+    /**
+     * Create tables of Database
+     * @param conn - connection to database
+     */
     private static void createTables(Connection conn) {
         String createWarehouseTable = "create table Warehouses (warehouseID integer primary key not Null," +
                 "shelfCapacity integer)";
@@ -372,6 +396,10 @@ public class Database {
 
     }
 
+    /**
+     * Utility function for TESTING
+     * @throws SQLException
+     */
     public void initTestDB() throws SQLException {
     	Database db = this;
     	db.insertWarehouse(0, 1000);
@@ -380,7 +408,6 @@ public class Database {
 			db.insertShelf(i++, 0, 1); // middle shelves
 			db.insertShelf(i++, 0, 2); //top shelf
 		}
-		System.out.println();
 		int n = 5;
 		for(int i = 0; i < n; i++) {
 			db.insertItem(i, ItemType.SCREW);
@@ -392,47 +419,82 @@ public class Database {
 		}
     }
 
+    /**
+     * Delete utility Database
+     * @throws SQLException
+     */
     public void deleteTestDB() throws SQLException {
         this.deleteWarehouse(0);
     }
 
+    /**
+     * Notify listeners of changes
+     * @param eType - type of event
+     * @param itemType
+     * @param id - id of shelf where event occured
+     */
     private void fireEvent(EventType eType, ItemType itemType, int id) {
         DBEvent e = new DBEvent(eType, itemType, id);
-        for (DBListener l : listeners) l.notifyEvent(e);
+    	for (DBListener l : listeners) l.notifyEvent(e);
     }
 
-    int getFreeShelf() throws SQLException {
+    /**
+     * find location of a free shelf
+     * @return id of shelf to be queried, -1 if error or warehouse full
+     * @throws SQLException
+     */
+    int getFreeShelf() {
         synchronized (freeShelfStmt) {
-            ResultSet res = freeShelfStmt.executeQuery();
-            while (res.next()) {
-                int ret = res.getInt("shelfid");
-                if (!shelvesToBeFilled.contains(ret)) {
-                    shelvesToBeFilled.add(ret);
-                    return ret;
-                }
-            }
+            ResultSet res;
+			try {
+				res = freeShelfStmt.executeQuery();
+	            while (res.next()) {
+	                int ret = res.getInt("shelfid");
+	                if (!shelvesToBeFilled.contains(ret)) {
+	                    shelvesToBeFilled.add(ret);
+	                    return ret;
+	                }
+	            }
+	            return -1;
+			} catch (SQLException e) {
+				return -1;
+			}
         }
-        return -1;
     }
 
-
-    private int numFreeShelves(int warehouseID) throws SQLException {
+    /**
+     * Get number of total free shelves in warehouse
+     * @param warehouseID - id of warehouse to be searched in
+     * @return number of free shelves, -1 if error or warehouse doesn't exist
+     * @throws SQLException
+     */
+    private int numFreeShelves(int warehouseID) {
         synchronized (numShelvesStmt) {
-            numShelvesStmt.setInt(1, warehouseID);
-            numUsedShelvesStmt.setInt(1, warehouseID);
-            ResultSet res1 = numUsedShelvesStmt.executeQuery();
-            int numUsed = 0;
-            if (res1.next()) {
-                numUsed = res1.getInt("total");
-            }
-            res1.close();
-            ResultSet res2 = numShelvesStmt.executeQuery();
-            int numTotal = 0;
-            if (res2.next()) numTotal = res2.getInt(1);
-            return numTotal - numUsed;
+            try {
+				numShelvesStmt.setInt(1, warehouseID);
+	            numUsedShelvesStmt.setInt(1, warehouseID);
+	            ResultSet res1 = numUsedShelvesStmt.executeQuery();
+	            int numUsed = 0;
+	            if (res1.next()) {
+	                numUsed = res1.getInt("total");
+	            }
+	            res1.close();
+	            ResultSet res2 = numShelvesStmt.executeQuery();
+	            int numTotal = 0;
+	            if (res2.next()) numTotal = res2.getInt(1);
+	            return numTotal - numUsed;
+			} catch (SQLException e) {
+				return -1;
+			}
         }
     }
 
+    /**
+     * Utility function for converting a string to Object of class ItemType
+     * This needs to be done because items are stored as strings in db
+     * @param s - string to be converted
+     * @return ItemType associated with String s, null if no match
+     */
     private ItemType stringToItem(String s) {
         switch (s) {
             case "SCREW":
@@ -454,17 +516,7 @@ public class Database {
         }
         return null;
     }
-
-    void lockDB() {
-    	dbLocked = true;
-    }
-    
-    void unLockDB() {
-    	dbLocked = false;
-    }
-    
-    boolean isLocked() { return dbLocked;};
-    /**
+/**
      * Utility function for writing status messages to stdout
      * @param msg - Message to be printed
      */

@@ -3,7 +3,6 @@ import shared.ItemType;
 
 /**
  * Class encapsulating information about a database event
- * TODO: So far this represents changes to items only, maybe this needs to be generalized
  * @author Tom Peham
  *
  */

@@ -12,11 +12,16 @@ import javax.swing.table.JTableHeader;
 
 import shared.ItemType;
 
+/**
+ * Simple class encapsulating the Warehouse GUI
+ * @author tom
+ *
+ */
 public class WarehouseGUI implements DBListener{
 
 
-    static private DefaultTableModel model;
-    static private JTable table;
+    private DefaultTableModel model;
+    private JTable table;
     
 	void openGui() {
 		

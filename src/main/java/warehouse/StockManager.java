@@ -8,7 +8,6 @@ import java.util.HashMap;
 
 /**
  * Class handling warehouse stock. This class is responsible for issuing new orders 
- * and notifying monitoring subsystem if warehouse gets full
  * @author tom
  *
  */
@@ -43,7 +42,6 @@ public class StockManager implements DBListener{
 					requestNewOrder(e.itemType);
 				}
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		} else if(e.eType.equals(EventType.ItemAdded)) {
@@ -52,7 +50,6 @@ public class StockManager implements DBListener{
 					deliveryPending.put(e.itemType, false);
 				}
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}

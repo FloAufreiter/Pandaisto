@@ -24,8 +24,7 @@ public abstract class MessagingInterface {
 			ShelfType s = new ShelfType(id, level);
 			return s;
 		} catch (SQLException e) {
-			// TODO properly handle this
-			e.printStackTrace();
+			
 		}
 		return null;
 	}

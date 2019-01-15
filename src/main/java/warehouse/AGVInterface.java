@@ -26,6 +26,11 @@ public class AGVInterface extends MessagingInterface {
 		}
 	}
 
+	/**
+	 * Method needs to be called by AGV subsystem so that database can remove item
+	 * @param shelfPlaceID - shelf to remove item from
+	 * @param type - ItemType that is removed from db
+	 */
 	public static void confirmItemAdded(int shelfPlaceID, ItemType type) {
 		try {
 			Database.getInstance().insertItem(shelfPlaceID, type);

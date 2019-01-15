@@ -2,7 +2,6 @@ package warehouse;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Date;
 import org.apache.commons.io.FileUtils;
 
@@ -13,7 +12,6 @@ import org.apache.commons.io.FileUtils;
  */
 public class BackupManager extends Thread {
 
-	private Date lastBackup;
 	private int backupInterval; //interval of backups in days
 	private boolean interrupted;
 	File backup;
@@ -23,7 +21,6 @@ public class BackupManager extends Thread {
 	 * Public constructor
 	 */
 	BackupManager(int backupInterval, String srcPath, String destPath) {
-		lastBackup = new Date();
 		this.backupInterval = backupInterval;
 		interrupted = false;
 		this.backup = new File(destPath);
@@ -42,8 +39,6 @@ public class BackupManager extends Thread {
 				copyDB();
 			} catch(IOException e) {
 				e.printStackTrace();
-			} finally {
-				
 			}
 			
 			while(! interrupted) {
@@ -55,7 +50,6 @@ public class BackupManager extends Thread {
 				e.printStackTrace();
 			}
 			
-			lastBackup = new Date(); //creating new date gets current day and time
 			}
 		} catch(InterruptedException e) {
 			interrupted = true;
@@ -69,33 +63,8 @@ public class BackupManager extends Thread {
 	 */
 	private void copyDB() throws IOException {
 		Database.warehousePrint("CREATING BACKUP");
-		try {
-			Database.getInstance().lockDB();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				Database.getInstance().unLockDB();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 		FileUtils.copyDirectory(DB, backup);
-		try {
-			Database.getInstance().unLockDB();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				Database.getInstance().unLockDB();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+
 		Database.warehousePrint("BACKUP DONE");
 	}
 }
