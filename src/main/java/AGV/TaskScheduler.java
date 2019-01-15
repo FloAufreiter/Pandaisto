@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
+
+/**
+ * Schedules all the incoming Tasks to different Forklifts
+ * Blocks if more then 100 Tasks in queue
+ * Provides the function createTask to add new Tasks
+ */
 public class TaskScheduler implements Runnable {
 
     private ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -52,7 +58,6 @@ public class TaskScheduler implements Runnable {
                 nearest_free.addTask(t);
                 nearest_free.setStatus(Forklift.Status.IN_USE);
                 if (nearest_free.isFullyLoaded()) {
-                	
                     executorService.execute(nearest_free);
                     freeLifters.remove(nearest_free);
                 }
@@ -93,7 +98,6 @@ public class TaskScheduler implements Runnable {
             }
         }
     }
-
 
     @Override
     public void run() {
