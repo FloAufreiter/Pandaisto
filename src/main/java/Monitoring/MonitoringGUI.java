@@ -15,6 +15,8 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
 import java.awt.FlowLayout;
 
@@ -33,9 +35,9 @@ public class MonitoringGUI {
 	public JFrame frame;
 	private JTextField textField;
 	private JTextField textField_1;
-	private JLabel lblOngoingOrders = new JLabel("Ongoing Customer Orders: 0");
+	private JTextField lblOngoingOrders = new JTextField("Ongoing Customer Orders: 0");
 
-	private JLabel lblOngoingComponentOrders = new JLabel("Ongoing Component Orders: 0");
+	private JTextField lblOngoingComponentOrders = new JTextField("Ongoing Component Orders: 0");
 	private JTextField textField_2;
 
 	/**
@@ -99,6 +101,34 @@ public class MonitoringGUI {
 		textField_2 = new JTextField();
 		textField_2.setText("<Customer Name>");
 		textField_2.setColumns(10);
+		
+		lblOngoingComponentOrders.addPropertyChangeListener(new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				
+				lblOngoingOrders.setText("Ongoing Customer Orders: " + Monitor.getInstance().getNumberOfOngoingCustomerOrders());
+				lblOngoingComponentOrders.setText("Ongoing Component Orders: " + Monitor.getInstance().getNumberOfOngoingComponentsOrders());			
+				
+			}
+			
+			
+			
+		});
+		
+		lblOngoingOrders.addPropertyChangeListener(new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				
+				lblOngoingOrders.setText("Ongoing Customer Orders: " + Monitor.getInstance().getNumberOfOngoingCustomerOrders());
+				lblOngoingComponentOrders.setText("Ongoing Component Orders: " + Monitor.getInstance().getNumberOfOngoingComponentsOrders());			
+				
+			}
+			
+			
+			
+		});
 		
 		JList list = new JList();
 
@@ -188,5 +218,11 @@ public class MonitoringGUI {
 
 			}
 		});
+	}
+	
+	public void Refresh() {
+		lblOngoingOrders.setText("Ongoing Customer Orders:" + Monitor.getInstance().getNumberOfOngoingCustomerOrders());
+		lblOngoingComponentOrders.setText("Ongoing Component Orders:" + Monitor.getInstance().getNumberOfOngoingComponentsOrders());		
+		frame.repaint();
 	}
 }

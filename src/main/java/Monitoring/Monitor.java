@@ -1,6 +1,7 @@
 package Monitoring;
 
 import java.awt.EventQueue;
+import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -20,6 +21,10 @@ public class Monitor implements Runnable {
 
     private static ArrayList<ComponentOrder> ONGOING_ORDERS = new ArrayList<ComponentOrder>();
     private static ArrayList<Supplier> SUPPLIER = new ArrayList<Supplier>();
+    
+    MonitoringGUI gui = new MonitoringGUI();
+    
+    
 
     private static OnlineStore onlineStore = OnlineStore.getInstance();
 
@@ -86,6 +91,9 @@ public class Monitor implements Runnable {
         }
 
         ONGOING_ORDERS.add(new ComponentOrder(amount, itemType, supplier));
+        gui.Refresh();
+        
+        // forward order to the regarding subsystems
         orderComponents();
     }
     
@@ -108,6 +116,8 @@ public class Monitor implements Runnable {
 				}
 
     		}
+    		
+    		gui.Refresh();
     }
 
     public void createCustomerOrder(int amount, ItemType itemType, Customer customer) {
@@ -146,8 +156,8 @@ public class Monitor implements Runnable {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    MonitoringGUI window = new MonitoringGUI();
-                    window.frame.setVisible(true);
+                   // MonitoringGUI window = new MonitoringGUI();
+                   // window.frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -160,14 +170,21 @@ public class Monitor implements Runnable {
         if (monitor == null) {
             monitor = new Monitor();
             try {
+          		
                 warehouse = Database.getInstance();
+                
+                // Starting Warehouse GUI 
                 MonitoringInterface.startGUI();
             } catch (SQLException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            
+            // start AGV
             agv = AGV.getInstance();
             agv.startAGV();
+            
+            // get RobotScheduler isntance
             rob = RobotScheduler.getInstance();
         }
         return monitor;
@@ -177,6 +194,7 @@ public class Monitor implements Runnable {
     public void requestItemForProductionLine(int locID, ItemType item) {
         Location prodLine = Area.getInstance().getLocation(Location.LocationType.PRODUCTION_LINE, locID);
 
+        gui.Refresh();
         TaskScheduler ts = AGV.getInstance().getAGVTaskScheduler();
         boolean task_created = false;
         ShelfType st = null;
@@ -188,7 +206,7 @@ public class Monitor implements Runnable {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
+                   
                     e.printStackTrace();
                 }
             else {
@@ -204,6 +222,10 @@ public class Monitor implements Runnable {
                 }
             }
         }
+        gui.Refresh();
+        
+        
+        
     }
 
     public void removeItemForProductionLine(int locID, int amount, ItemType item) {
@@ -221,7 +243,7 @@ public class Monitor implements Runnable {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
+                        
                         e.printStackTrace();
                     }
                 else {
@@ -275,20 +297,24 @@ public class Monitor implements Runnable {
         STOP = true;
     }
 
+    
     public void orderComponents(ItemType itemType, int amount) {
         createComponentOrder(amount, itemType);
     }
 
     private void orderComponents() {
+    		gui.Refresh();
+    		// run throw orders
         for (ComponentOrder c : ONGOING_ORDERS) {
             OrderRunner r = new OrderRunner(c.container);
             r.run();
         }
     }
 
-
+    // class to simulate Components Delivery
     private static class OrderRunner implements Runnable {
-        ItemContainer order; //TODO stopfe in andere Klasse
+    	   		
+        ItemContainer order;
 
         OrderRunner(ItemContainer order) {
             this.order = order;
@@ -298,7 +324,6 @@ public class Monitor implements Runnable {
         public void run() {
             try {
                 TaskScheduler ts = AGV.getInstance().getAGVTaskScheduler();
-                //TODO which Order IF
                 boolean task_created = false;
                 ShelfType st = null;
                 Random rand = new Random();
@@ -306,7 +331,7 @@ public class Monitor implements Runnable {
                 Location l2;
                 for (int i = 0; i < order.getAmount(); i++) {
                     while (st == null) {
-                        //ask Warehouse where to bring
+                        // ask Warehouse where to bring
                         st = MonitoringInterface.getFreeItemLocation();
                         if (st == null) Thread.sleep(1000);
                         else {
@@ -322,6 +347,7 @@ public class Monitor implements Runnable {
                         task_created = false;
                     }
                 }
+                
                 ONGOING_ORDERS.remove(order);
             } catch (InterruptedException e) {
                 e.printStackTrace();

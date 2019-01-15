@@ -12,6 +12,7 @@ public class OnlineStore {
     private static ArrayList<CustomerOrder> ORDERS = new ArrayList<CustomerOrder>();
 
     private static OnlineStore onlineStore = new OnlineStore();
+    
 
     private OnlineStore() {
 
@@ -40,6 +41,7 @@ public class OnlineStore {
         }
     }
 
+    // add Customer Order to System.
     public void createCustomerOrder(int amount, ItemType itemType, Customer customer, boolean done) {
 
         if (!Customer.getCustomers().contains(customer)) {
@@ -50,13 +52,24 @@ public class OnlineStore {
     }
 
     public int getNumberOfOngoingComponentsOrders() {
-        return ORDERS.size();
+    	
+    		int counter = 0;
+    		for(CustomerOrder order : ORDERS) {
+    			if(!order.getDone()) {
+    				counter++;
+    			}
+    		}
+    		
+        return counter;
     }
     
     public ArrayList<CustomerOrder> getCustomerOrders() {
         return (ArrayList<CustomerOrder>) ORDERS.clone();
     }
     
+    // older Orders are priorized - so the FIFO principle is used here 
+    // the first found not done order is returned
+    // if there is no not done order - null is returned
     public CustomerOrder getOldestOngoingOrders() {
     		for(CustomerOrder order : ORDERS) {
     			if(!order.getDone()) {
