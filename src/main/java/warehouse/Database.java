@@ -63,7 +63,8 @@ public class Database {
     private final PreparedStatement itemStockStmt;
     private final PreparedStatement getLevelStmt;
     private final PreparedStatement itemStockWHStmt;
-
+    private final PreparedStatement getItemAtStmt;
+    
     //keep track of what id'S have been already been given out
     private final HashSet<Integer> itemsToBeRemoved = new HashSet<>();
     private final HashSet<Integer> shelvesToBeFilled = new HashSet<>();
@@ -103,7 +104,7 @@ public class Database {
         itemStockStmt = conn.prepareStatement("Select count(*) as cnt from shelves where type=?");
         itemStockWHStmt = conn.prepareStatement("Select count(*) as cnt from shelves where warehouseID=? and type is not null");
         getLevelStmt = conn.prepareStatement("Select level from shelves where shelfID=?");
-        
+        getItemAtStmt = conn.prepareStatement("Select type from shelves where shelfID=?");
         
         listeners = new ArrayList<>();
         this.addListener(new StockManager());
@@ -127,6 +128,25 @@ public class Database {
         }
     }
 
+    public ItemType getItemAt(int shelfID) {
+    	synchronized (getItemAtStmt) {
+            try {
+                getItemAtStmt.setInt(1, shelfID);
+
+                ResultSet res = getItemAtStmt.executeQuery();
+                String ret = "";
+                if (res.next()) { 
+                    ret = res.getString("type");
+                }
+                if(ret == null) return null;
+                return stringToItem(ret);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+        
+		}
+    }
     /**
      * Method for removing warehouse from subsystem
      *
@@ -234,7 +254,7 @@ public class Database {
                 e.printStackTrace();
                 return false;
             }
-            fireEvent(EventType.ItemAdded, type);
+            fireEvent(EventType.ItemAdded, type, shelfID);
             return true;
         }
     }
@@ -273,7 +293,7 @@ public class Database {
             }
             if (itemsToBeRemoved.contains(shelfID)) itemsToBeRemoved.remove(shelfID);
 
-            fireEvent(EventType.ItemRemoved, stringToItem(itemType));
+            fireEvent(EventType.ItemRemoved, stringToItem(itemType), shelfID);
             return true;
         }
     }
@@ -376,8 +396,8 @@ public class Database {
         this.deleteWarehouse(0);
     }
 
-    private void fireEvent(EventType eType, ItemType itemType) {
-        DBEvent e = new DBEvent(eType, itemType);
+    private void fireEvent(EventType eType, ItemType itemType, int id) {
+        DBEvent e = new DBEvent(eType, itemType, id);
         for (DBListener l : listeners) l.notifyEvent(e);
     }
 

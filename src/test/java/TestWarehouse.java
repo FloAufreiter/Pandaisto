@@ -4,6 +4,7 @@ import org.junit.Test;
 import shared.ItemType;
 import warehouse.BackupManager;
 import warehouse.Database;
+import warehouse.MonitoringInterface;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -104,5 +105,11 @@ public class TestWarehouse {
     public void testBackup() throws InterruptedException {
     	boolean fileExists = Files.exists(Paths.get("./DBBACKUP")); //backup should already have been done at startup
     	assertEquals(true, fileExists);
+    }
+    
+    @Test
+    public void testOpenGUI() throws InterruptedException {
+    	MonitoringInterface.startGUI();
+    	Thread.sleep(10000);
     }
 }

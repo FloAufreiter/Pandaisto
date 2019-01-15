@@ -10,14 +10,14 @@ import java.sql.SQLException;
  * @author tom
  */
 public class MonitoringInterface extends MessagingInterface {
-
+	
     /**
      * Method to get number of items in stock of type type
      *
      * @param type - type of item to count
      * @return number of items in stock, -1 in case of failure
      */
-    public int getItemStock(ItemType type) {
+    public static int getItemStock(ItemType type) {
         try {
             return Database.getInstance().itemsInStock(type);
         } catch (SQLException e) {
@@ -25,5 +25,13 @@ public class MonitoringInterface extends MessagingInterface {
             e.printStackTrace();
         }
         return -1;
+    }
+    
+    /**
+     * Method for monitor to start display of items
+     * @return
+     */
+    public static void startGUI() {
+    	new WarehouseGUI().openGui();
     }
 }

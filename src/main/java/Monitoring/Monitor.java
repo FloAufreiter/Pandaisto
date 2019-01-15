@@ -101,6 +101,7 @@ public class Monitor implements Runnable {
             monitor = new Monitor();
             try {
                 warehouse = Database.getInstance();
+                MonitoringInterface.startGUI();
             } catch (SQLException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
