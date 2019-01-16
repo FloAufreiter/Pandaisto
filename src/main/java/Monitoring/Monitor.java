@@ -213,12 +213,6 @@ public class Monitor implements Runnable {
                 shelfLoc = Area.getInstance().getLocation(st.getType(), st.getId());
                 while (!task_created) {
                     task_created = ts.createTask(shelfLoc, prodLine, item);
-                    if(!task_created) {
-                        System.out.println("FUcking Shelf location!!!!");
-                        System.out.println(shelfLoc);
-                        System.out.println(st.getType());
-                        System.out.println(st.getId());
-            		}       
                 }
             }
         }
@@ -250,7 +244,6 @@ public class Monitor implements Runnable {
                     l2 = Area.getInstance().getLocation(st.getType(), st.getId());
                     while (!task_created) {
                         task_created = ts.createTask(prodLine, l2, item);
-
                     }
                 }
             }

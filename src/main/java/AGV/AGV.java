@@ -5,6 +5,13 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
 
+
+/**
+ * Interface for the other subsystems
+ * provided as a singleton
+ * AGV needs to be started explicitly
+ * then Tasks can be added by using the function createTask of the TaskScheduler
+ */
 public class AGV {
     private static TaskScheduler scheduler;
 
@@ -19,7 +26,7 @@ public class AGV {
     private static final AGV instance = new AGV();
 
     private AGV() {
-        this.scheduler = new TaskScheduler();
+        scheduler = new TaskScheduler();
     }
 
     public TaskScheduler getAGVTaskScheduler() {
@@ -36,7 +43,7 @@ public class AGV {
         scheduler.stopScheduler();
     }
 
-    static void openGui() {
+    private static void openGui() {
         JFrame frame = new JFrame("AGV");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(1000,400);

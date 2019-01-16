@@ -1,5 +1,9 @@
 package AGV;
+
 import java.util.List;
+
+import Monitoring.Monitor;
+import assembly_robot_arms.Arm;
 import assembly_robot_arms.RobotScheduler;
 import shared.ItemType;
 import warehouse.AGVInterface;
@@ -48,7 +52,7 @@ class Forklift implements Runnable {
         IN_USE
     }
 
-    boolean loadingRouteEmpty () {
+    boolean loadingRouteEmpty() {
         return loadingRoute.getStops().isEmpty();
     }
 
@@ -66,19 +70,19 @@ class Forklift implements Runnable {
             Location nearest = getNextNearestLocation(route);
             driveToLocation(nearest);
             List<Task> tasks = route.getStops().get(nearest);
-            for(Task t: tasks) {
-	            switch (t.getCurrentState()) {
-	                case unprocessed:
-	                    loadCommodity(nearest);
-	                    t.switchState();
-	                    break;
-	                case loaded:
-	                    unloadCommodity(t.getItemType(), nearest);
-	                    t.switchState();
-	                    break;
-	                case finished:
-	                    break;
-	            }
+            for (Task t : tasks) {
+                switch (t.getCurrentState()) {
+                    case unprocessed:
+                        loadCommodity(nearest);
+                        t.switchState();
+                        break;
+                    case loaded:
+                        unloadCommodity(t.getItemType(), nearest);
+                        t.switchState();
+                        break;
+                    case finished:
+                        break;
+                }
             }
             route.getStops().remove(nearest);
             currentLocation = nearest;
@@ -148,7 +152,7 @@ class Forklift implements Runnable {
         try {
             System.out.println("Forklift " + this.getId() + " unloading");
             Thread.sleep(2000);
-            switch(location.getType()) {
+            switch (location.getType()) {
                 case FLOOR_SHELF:
                     AGVInterface.confirmItemAdded(location.getId(), it);
                     break;
@@ -161,7 +165,10 @@ class Forklift implements Runnable {
                     AGVInterface.confirmItemAdded(location.getId(), it);
                     break;
                 case PRODUCTION_LINE:
-                   RobotScheduler.get(location.getId()).addElement(it);
+                    Arm arm= RobotScheduler.getInstance().get(location.getId());
+                    if(arm == null)  System.out.println("Location " + location + " Element: " + it);
+                    else arm.addElement(it);
+                    System.out.println(Monitor.getInstance().getNumberOfOngoingComponentsOrders());
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -172,8 +179,8 @@ class Forklift implements Runnable {
         loadingRoute.addLocation(t.getLocationA(), t);
         unloadingRoute.addLocation(t.getLocationB(), t);
     }
-    
+
     void setStatus(Status s) {
-    	this.status = s;
+        this.status = s;
     }
 }
