@@ -1,11 +1,5 @@
 package Monitoring;
 
-import java.awt.EventQueue;
-import java.beans.PropertyChangeEvent;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Random;
-
 import AGV.AGV;
 import AGV.Area;
 import AGV.Location;
@@ -16,6 +10,11 @@ import shared.ItemType;
 import warehouse.Database;
 import warehouse.MonitoringInterface;
 import warehouse.ShelfType;
+
+import java.awt.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Monitor implements Runnable {
 
@@ -156,8 +155,7 @@ public class Monitor implements Runnable {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                   // MonitoringGUI window = new MonitoringGUI();
-                   // window.frame.setVisible(true);
+                    gui.frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
