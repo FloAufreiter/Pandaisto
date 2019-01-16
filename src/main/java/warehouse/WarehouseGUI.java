@@ -28,6 +28,7 @@ public class WarehouseGUI implements DBListener{
         JFrame frame = new JFrame("Warehouse");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(600,600);
+        frame.setLocation(0, 400);
         String[] colNames = {"Shelf Number", "Item"};
         model = new DefaultTableModel(colNames, 0);
         table = new JTable(model);

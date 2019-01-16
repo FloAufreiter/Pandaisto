@@ -15,6 +15,7 @@ public class ConveyorGUI {
 		frame = new JFrame("Conveyor GUI");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1000,1000);
+		frame.setLocation(800, 450);
 		JComponent conveyorcomp = new JComponent() {
 			private static final long serialVersionUID = 2L;
 			private BeltSegment[] belts = firstBelt;

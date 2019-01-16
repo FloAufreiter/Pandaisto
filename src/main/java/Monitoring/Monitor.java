@@ -122,7 +122,8 @@ public class Monitor implements Runnable {
     public void createCustomerOrder(int amount, ItemType itemType, Customer customer) {
 
     		// start production (if it isn't already running)
-        rob.startRobotArms();
+    	if(RobotScheduler.getArms()[0] == null)
+    		rob.startRobotArms();
 
         if(onlineStore.checkAvailability(100, itemType) <= 5) {
         		int shelfId = -1;

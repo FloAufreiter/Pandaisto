@@ -63,6 +63,7 @@ public class AGV {
         JFrame frame = new JFrame("AGV");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(1000, 400);
+        frame.setLocation(800, 0);
         String[] colNames = {"ID", "Availability Status", "Current Location"};
         model = new DefaultTableModel(colNames, 0);
         table = new JTable(model);
