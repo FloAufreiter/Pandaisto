@@ -29,24 +29,40 @@ public class AGV {
         scheduler = new TaskScheduler();
     }
 
+    /**
+     * @return the TaskScheduler of this AGV system
+     */
     public TaskScheduler getAGVTaskScheduler() {
         return scheduler;
     }
 
+    /**
+     * Starts the whole AGV system
+     * Opens the GUI for scheduler status
+     * Starts the TaskScheduler, which is then ready to accept Tasks
+     */
     public void startAGV() {
         openGui();
         schedulerThread = new Thread(scheduler);
         schedulerThread.start();
     }
 
+    /**
+     * Stops the whole AGV system
+     * Remaining tasks in queue are still executed
+     * Thread stops, when all Tasks are done
+     */
     public void stopAGV() {
         scheduler.stopScheduler();
     }
 
+    /**
+     * opens the GUI of the AGV
+     */
     private static void openGui() {
         JFrame frame = new JFrame("AGV");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(1000,400);
+        frame.setSize(1000, 400);
         String[] colNames = {"ID", "Availability Status", "Current Location"};
         model = new DefaultTableModel(colNames, 0);
         table = new JTable(model);
@@ -57,8 +73,8 @@ public class AGV {
         header.setFont(f);
         Font f2 = new Font("Arial", Font.PLAIN, 15);
         table.setFont(f2);
-        for(Forklift fork: scheduler.getForklifts()) {
-            Object [] data = {fork.getId(), fork.getStatus(), fork.getCurrentLocation()};
+        for (Forklift fork : scheduler.getForklifts()) {
+            Object[] data = {fork.getId(), fork.getStatus(), fork.getCurrentLocation()};
             model.addRow(data);
         }
         frame.getContentPane().add(scrollPane);
@@ -69,9 +85,15 @@ public class AGV {
         return schedulerThread;
     }
 
+
+    /**
+     * updates the information about a forklift in the GUI
+     *
+     * @param f
+     */
     void updateGui(Forklift f) {
-        model.setValueAt(f.getStatus() ,f.getId(),1);
-        model.setValueAt(f.getCurrentLocation() ,f.getId(),2);
+        model.setValueAt(f.getStatus(), f.getId(), 1);
+        model.setValueAt(f.getCurrentLocation(), f.getId(), 2);
         table.repaint();
     }
 }

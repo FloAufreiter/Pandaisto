@@ -170,9 +170,7 @@ public class Monitor implements Runnable {
         if (monitor == null) {
             monitor = new Monitor();
             try {
-          		
                 warehouse = Database.getInstance();
-                
                 // Starting Warehouse GUI 
                 MonitoringInterface.startGUI();
             } catch (SQLException e) {

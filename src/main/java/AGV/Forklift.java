@@ -1,12 +1,10 @@
 package AGV;
 
-import java.util.List;
-
-import Monitoring.Monitor;
-import assembly_robot_arms.Arm;
 import assembly_robot_arms.RobotScheduler;
 import shared.ItemType;
 import warehouse.AGVInterface;
+
+import java.util.List;
 
 class Forklift implements Runnable {
 
@@ -65,6 +63,10 @@ class Forklift implements Runnable {
         AGV.getInstance().updateGui(this);
     }
 
+    /**
+     * executes the loading or unloading route of this forklift
+     * @param route
+     */
     private void executeRoute(Route route) {
         while (!route.getStops().isEmpty()) {
             Location nearest = getNextNearestLocation(route);
@@ -90,6 +92,11 @@ class Forklift implements Runnable {
         }
     }
 
+    /**
+     * returns the next nearest location on a given route
+     * @param route
+     * @return
+     */
     private Location getNextNearestLocation(Route route) {
         Location nearest = null;
         double min_cost = Double.MAX_VALUE;
@@ -165,10 +172,7 @@ class Forklift implements Runnable {
                     AGVInterface.confirmItemAdded(location.getId(), it);
                     break;
                 case PRODUCTION_LINE:
-                    Arm arm= RobotScheduler.getInstance().get(location.getId());
-                    if(arm == null)  System.out.println("Location " + location + " Element: " + it);
-                    else arm.addElement(it);
-                    System.out.println(Monitor.getInstance().getNumberOfOngoingComponentsOrders());
+                    RobotScheduler.getInstance().get(location.getId()).addElement(it);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

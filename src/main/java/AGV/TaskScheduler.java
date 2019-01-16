@@ -15,7 +15,7 @@ import java.util.concurrent.*;
 public class TaskScheduler implements Runnable {
 
     private ExecutorService executorService = Executors.newFixedThreadPool(10);
-    
+
     void stopScheduler() {
         STOP_AGV = true;
     }
@@ -67,7 +67,7 @@ public class TaskScheduler implements Runnable {
         }
         if (!freeLifters.isEmpty()) {
             for (Forklift f : freeLifters) {
-                if(!f.loadingRouteEmpty()) {
+                if (!f.loadingRouteEmpty()) {
                     executorService.execute(f);
                 }
             }
@@ -85,7 +85,8 @@ public class TaskScheduler implements Runnable {
     }
 
     public synchronized boolean createTask(Location location1, Location location2, ItemType itemType) {
-        if(location1 == null || location2 == null) return false;
+        if (STOP_AGV) return false;
+        if (location1 == null || location2 == null) return false;
         if (tasks.size() == 100) {
             return false;
         } else {
@@ -101,8 +102,8 @@ public class TaskScheduler implements Runnable {
 
     @Override
     public void run() {
-        while (!STOP_AGV || !tasks.isEmpty() ) {
-                scheduleTasksToForklift();
+        while (!STOP_AGV || !tasks.isEmpty()) {
+            scheduleTasksToForklift();
         }
         executorService.shutdown();
         try {

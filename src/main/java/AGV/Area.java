@@ -12,6 +12,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Stream;
 
+
+/**
+ * Defines the Area of the factory as a graph
+ * Edges define the paths on which forklifts can run
+ * Used by other subsystems to get Location objects needed to create tasks for the fork lifts
+ * Uses Dijkstra Algorithm to compute the minimal cost distance between two locations
+ */
 public class Area {
     private static HipsterGraph<Location, Double> GRAPH;
 
@@ -22,7 +29,7 @@ public class Area {
     private static Area instance = new Area();
 
     private Area() {
-            buildGraph();
+        buildGraph();
     }
 
     public static Area getInstance() {
@@ -31,7 +38,9 @@ public class Area {
 
     public Location getLocation(Location.LocationType type, int id) {
         switch (type) {
-            case FLOOR_SHELF: case TOP_SHELF1: case TOP_SHELF2:
+            case FLOOR_SHELF:
+            case TOP_SHELF1:
+            case TOP_SHELF2:
                 return SHELVES.get(id);
             case PRODUCTION_LINE:
                 return ROBOT_ARMS.get(id);
@@ -49,7 +58,11 @@ public class Area {
         return (Location) locations[random.nextInt(locations.length)];
     }
 
-    private static void buildGraph() { //should later be done by Spec-File
+    /**
+     * builds the graph, representing the area of the factory
+     * should later be build by using a Spec-File to be able to Start the system with different graphs (factories)
+     */
+    private static void buildGraph() {
         GraphBuilder<Location, Double> gb = GraphBuilder.create();
 
         //shelves
@@ -108,6 +121,12 @@ public class Area {
         }
     }
 
+    /**
+     *
+     * @param start
+     * @param dest
+     * @return the minimal cost between two locations
+     */
     Double getMinimalCostFrom(Location start, Location dest) {
         SearchProblem p = GraphSearchProblem
                 .startingFrom(start)
