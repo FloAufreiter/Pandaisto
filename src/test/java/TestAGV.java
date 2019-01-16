@@ -23,7 +23,6 @@ import static org.junit.Assert.assertFalse;
 /**
  * Tests for AGV
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestAGV {
 
     @Before
