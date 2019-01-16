@@ -42,7 +42,7 @@ public class RobotScheduler {
 	}
 	
 	
-	private void initArms() {
+	public void initArms() {
 		arms[0] = new Arm(belt,16);
 		arms[0].addStorageType(new RobotStorage(ItemType.CAR_BODY, 10, 5));
 
@@ -74,5 +74,13 @@ public class RobotScheduler {
 
 		arms[9] = new Arm(belt, 18);
 		arms[9].addStorageType(new RobotStorage(ItemType.FINISHED_BLUE_CAR, 3, 10));
+	}
+
+	public static Arm[] getArms() {
+		return arms;
+	}
+
+	public BeltControlSystem getBelt() {
+		return belt;
 	}
 }

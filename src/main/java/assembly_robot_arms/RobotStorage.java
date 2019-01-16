@@ -11,6 +11,10 @@ public class RobotStorage {
     int maxNrOfElements;
     int minNrOfElements;
 
+    public int getMaxNrOfElement() {
+    	return maxNrOfElements;
+    }
+    
     public int getNrOfElements() {
         return nrOfElements;
     }
